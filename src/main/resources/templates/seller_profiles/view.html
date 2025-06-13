@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<title th:text="${sellerProfile.user.username} + ' - Seller Profile'">Seller Profile</title>
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<style>
+		body {
+			margin: 0;
+		}
+
+		.profile-container {
+			max-width: 800px;
+			margin: 2rem auto;
+			padding: 2.5rem;
+			background-color: #fff;
+			border-radius: 12px;
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+			font-family: 'Inter', sans-serif;
+			color: #333;
+		}
+
+		.profile-header {
+			text-align: center;
+			margin-bottom: 2.5rem;
+			padding-bottom: 1.5rem;
+			border-bottom: 1px solid #eee;
+		}
+
+		.profile-picture {
+			width: 150px;
+			height: 150px;
+			border-radius: 50%;
+			object-fit: cover;
+			border: 4px solid #007bff;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+			margin-bottom: 1rem;
+		}
+
+		.profile-header h1 {
+			font-size: 2.5rem;
+			color: #007bff;
+			margin-bottom: 0.5rem;
+		}
+
+		.profile-header p {
+			font-size: 1.1rem;
+			color: #555;
+		}
+
+		.profile-section {
+			margin-bottom: 2rem;
+			padding: 1.5rem;
+			background-color: #f8f9fa;
+			border-radius: 8px;
+			box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+		}
+
+		.profile-section h2 {
+			font-size: 1.8rem;
+			color: #444;
+			margin-bottom: 1.2rem;
+			border-bottom: 2px solid #e9ecef;
+			padding-bottom: 0.5rem;
+		}
+
+		.profile-section p,
+		.profile-section ul {
+			font-size: 1rem;
+			line-height: 1.6;
+			color: #666;
+		}
+
+		.profile-section ul {
+			list-style: none;
+			padding: 0;
+		}
+
+		.profile-section ul li {
+			margin-bottom: 0.5rem;
+		}
+
+		.profile-section ul li i {
+			margin-right: 0.8rem;
+			color: #007bff;
+		}
+
+		.social-links a {
+			color: #007bff;
+			margin-right: 1rem;
+			font-size: 1.2rem;
+			transition: color 0.2s ease-in-out;
+		}
+
+		.social-links a:hover {
+			color: #0056b3;
+		}
+
+		.btn-group {
+			text-align: center;
+			margin-top: 3rem;
+		}
+
+		.btn {
+			padding: 0.8rem 1.8rem;
+			font-size: 1rem;
+			border-radius: 8px;
+			transition: background-color 0.2s, transform 0.2s;
+		}
+
+		.btn-primary {
+			background-color: #007bff;
+			color: white;
+			border: none;
+		}
+
+		.btn-primary:hover {
+			background-color: #0056b3;
+			transform: translateY(-2px);
+		}
+
+		.btn-secondary {
+			background-color: #6c757d;
+			color: white;
+			border: none;
+		}
+
+		.btn-secondary:hover {
+			background-color: #5a6268;
+			transform: translateY(-2px);
+		}
+	</style>
+</head>
+
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+	<div th:replace="~{fragments/messages :: messages}"></div>
+
+	<div class="profile-container">
+		<div class="profile-header">
+			<img th:src="${sellerProfile.profilePictureUrl != null and sellerProfile.profilePictureUrl != '' ? sellerProfile.profilePictureUrl : 'https://placehold.co/150x150/cccccc/333333?text=Profile'}"
+				alt="Profile Picture" class="profile-picture">
+			<h1 th:text="${sellerProfile.user.username}">Seller Name</h1>
+			<p
+				th:text="${sellerProfile.location != null and sellerProfile.location != '' ? sellerProfile.location : 'Location not specified'}">
+				Location</p>
+			<p th:text="${sellerProfile.user.email}">seller@example.com</p>
+		</div>
+
+		<div class="profile-section">
+			<h2>About Me</h2>
+			<p
+				th:text="${sellerProfile.description != null and sellerProfile.description != '' ? sellerProfile.description : 'No description provided yet.'}">
+				This is a placeholder description for the seller. They can describe their craft, their passion, their
+				journey, etc.
+			</p>
+		</div>
+
+		<div class="profile-section">
+			<h2>Contact & Links</h2>
+			<ul>
+				<li th:if="${sellerProfile.websiteUrl != null and sellerProfile.websiteUrl != ''}">
+					<i class="fas fa-globe"></i> Website: <a th:href="${sellerProfile.websiteUrl}" target="_blank"
+						th:text="${sellerProfile.websiteUrl}"></a>
+				</li>
+				<li th:if="${sellerProfile.socialMediaLinks != null and sellerProfile.socialMediaLinks != ''}">
+					<i class="fas fa-share-alt"></i> Social Media:
+					<span class="social-links">
+						<th:block th:each="link : ${#strings.arraySplit(sellerProfile.socialMediaLinks, ',')}">
+							<a th:href="${#strings.trim(link)}" target="_blank">
+								<i
+									th:classappend="${#strings.contains(link, 'facebook') ? 'fab fa-facebook' : (#strings.contains(link, 'instagram') ? 'fab fa-instagram' : (#strings.contains(link, 'twitter') ? 'fab fa-twitter' : 'fas fa-link'))}"></i>
+							</a>
+						</th:block>
+					</span>
+				</li>
+			</ul>
+		</div>
+
+		<!-- <div class="profile-section">
+            <h2>My Products</h2>
+            <div th:if="${sellerProfile.products.isEmpty()}" class="alert alert-info">
+                No products listed by this seller yet.
+            </div>
+            <div th:each="product : ${sellerProfile.products}">
+                <p th:text="${product.name}"></p>
+            </div>
+        </div> -->
+
+		<div class="btn-group" sec:authorize="isAuthenticated()">
+			<a th:if="${#authentication.principal.username == sellerProfile.user.username}"
+				th:href="@{/seller-profiles/my-profile/edit}" class="btn btn-primary">
+				<i class="fas fa-edit"></i> Edit My Profile
+			</a>
+			<a th:href="@{/marketplace}" class="btn btn-secondary">
+				<i class="fas fa-arrow-left"></i> Back to Home
+			</a>
+		</div>
+	</div>
+
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

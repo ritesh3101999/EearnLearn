@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${liveSession.id != null} ? 'Edit Live Session' : 'Schedule New Live Session'"></title>
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<style>
+		.form-container {
+			max-width: 700px;
+			margin: 2rem auto;
+			padding: 2rem;
+			background-color: #fff;
+			border-radius: 8px;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+		}
+
+		.form-container h1 {
+			margin-bottom: 1.5rem;
+			color: #333;
+		}
+
+		.form-group {
+			margin-bottom: 1rem;
+		}
+
+		.form-group label {
+			display: block;
+			margin-bottom: 0.5rem;
+			font-weight: 500;
+			color: #555;
+		}
+
+		.form-control {
+			width: 100%;
+			padding: 0.75rem;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			font-size: 1rem;
+		}
+
+		textarea.form-control {
+			resize: vertical;
+		}
+
+		.btn-toolbar {
+			margin-top: 1.5rem;
+			display: flex;
+			gap: 1rem;
+		}
+
+		.btn-toolbar .btn {
+			padding: 0.8rem 1.5rem;
+			font-size: 1rem;
+		}
+
+		.error-message {
+			color: #dc3545;
+			font-size: 0.875rem;
+			margin-top: 0.25rem;
+		}
+	</style>
+</head>
+
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+	<div th:replace="~{fragments/messages :: messages}"></div>
+
+	<div class="form-container">
+		<h1 th:text="${liveSession.id != null} ? 'Edit Live Session' : 'Schedule New Live Session'">Schedule Live
+			Session</h1>
+		<form th:action="@{/live-sessions/save}" th:object="${liveSession}" method="post">
+			<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+			<input type="hidden" th:field="*{id}" />
+
+			<div class="form-group">
+				<label for="title">Title:</label>
+				<input type="text" id="title" th:field="*{title}" class="form-control" required>
+				<div th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="error-message"></div>
+			</div>
+
+			<div class="form-group">
+				<label for="description">Description:</label>
+				<textarea id="description" th:field="*{description}" class="form-control" rows="5"></textarea>
+				<div th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="error-message"></div>
+			</div>
+
+			<div class="form-group">
+				<label for="startTime">Start Time:</label>
+				<!-- Use a datetime-local input for combined date and time -->
+				<input type="datetime-local" id="startTime" th:field="*{startTime}" class="form-control" required>
+				<div th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}" class="error-message"></div>
+			</div>
+
+			<div class="form-group">
+				<label for="endTime">End Time:</label>
+				<input type="datetime-local" id="endTime" th:field="*{endTime}" class="form-control" required>
+				<div th:if="${#fields.hasErrors('endTime')}" th:errors="*{endTime}" class="error-message"></div>
+			</div>
+
+			<div class="form-group">
+				<label for="meetingLink">Meeting Link (e.g., Zoom, Google Meet URL):</label>
+				<input type="url" id="meetingLink" th:field="*{meetingLink}" class="form-control" required>
+				<div th:if="${#fields.hasErrors('meetingLink')}" th:errors="*{meetingLink}" class="error-message"></div>
+			</div>
+
+			<div class="btn-toolbar">
+				<button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Session</button>
+				<a th:href="@{/live-sessions}" class="btn btn-secondary"><i class="fas fa-times-circle"></i> Cancel</a>
+			</div>
+		</form>
+	</div>
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle ?: 'My Enrolled Courses'}">My Enrolled Courses</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .enrollments-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .enrollment-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        .enrollment-card h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .enrollment-meta {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        .enrollment-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        .enrollment-actions .btn {
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.3em 0.6em;
+            border-radius: 0.25rem;
+            font-size: 0.8em;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-left: 0.5rem;
+        }
+        .status-enrolled { background-color: #007bff; color: white; }
+        .status-completed { background-color: #28a745; color: white; }
+        .status-dropped { background-color: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    <div th:replace="~{fragments/messages :: messages}"></div>
+    <div class="enrollments-container">
+        <h1><i class="fas fa-chalkboard"></i> <span th:text="${pageTitle}"></span></h1>
+        
+        <div th:if="${enrollments.isEmpty()}" class="alert alert-info">
+            You are not enrolled in any courses yet. <a th:href="@{/courses}">Explore courses!</a>
+        </div>
+        <div th:each="enrollment : ${enrollments}" class="enrollment-card">
+            <div class="enrollment-details">
+                <h3 th:text="${enrollment.course.title}">Course Title</h3>
+                <p th:text="${enrollment.course.description}"></p>
+                <div class="enrollment-meta">
+                    <p>Enrolled on: <span th:text="${#temporals.format(enrollment.enrollmentDate, 'dd MMM yyyy HH:mm')}"></span></p>
+                    <p>Status: <span th:text="${enrollment.status.name()}" th:classappend="'status-' + ${#strings.toLowerCase(enrollment.status.name())}" class="status-badge"></span></p>
+                </div>
+            </div>
+            <div class="enrollment-actions">
+                <a th:href="@{/courses/{id}(id=${enrollment.course.id})}" class="btn btn-info">
+                    <i class="fas fa-eye"></i> View Course
+                </a>
+                
+                <!-- Show "View Certificate" if COMPLETED -->
+                <a th:if="${enrollment.status.name() == 'COMPLETED'}"
+                   th:href="@{/certificates/my-certificates}" class="btn btn-warning">
+                    <i class="fas fa-certificate"></i> View Certificate
+                </a>
+                
+                <form th:if="${enrollment.status.name() == 'ENROLLED'}" 
+                      th:action="@{/enrollments/complete/{enrollmentId}(enrollmentId=${enrollment.id})}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button type="submit" class="btn btn-success" onclick="return confirm('Are you sure you want to mark this course as completed?');">
+                        <i class="fas fa-check-double"></i> Mark as Completed
+                    </button>
+                </form>
+
+                <form th:if="${enrollment.status.name() == 'ENROLLED'}"
+                      th:action="@{/enrollments/drop/{enrollmentId}(enrollmentId=${enrollment.id})}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to drop this course?');">
+                        <i class="fas fa-trash"></i> Drop Course
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

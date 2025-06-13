@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${pageTitle ?: 'Error Occurred'}">Error</title>
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<style>
+		body {
+			display: flex;
+			flex-direction: column;
+			min-height: 100vh;
+			background-color: #f0f2f5;
+			font-family: 'Inter', sans-serif;
+			/* Use Inter font */
+			color: #343a40;
+			/* Dark grey for general text */
+			margin: 0;
+		}
+
+		.error-container {
+			text-align: center;
+			padding: 60px 30px;
+			/* Increased padding */
+			max-width: 700px;
+			/* Slightly wider container */
+			margin: auto;
+			background-color: #fff;
+			border-radius: 12px;
+			/* More rounded corners */
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+			/* Softer, larger shadow */
+			flex-grow: 1;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			/* Center items horizontally */
+		}
+
+		.error-icon {
+			font-size: 6rem;
+			/* Larger icon */
+			color: #ef4444;
+			/* Tailwind red-500 for a more modern error look */
+			margin-bottom: 1.5rem;
+			/* Increased margin */
+			animation: bounceIn 0.8s ease-out;
+			/* Simple entry animation */
+		}
+
+		@keyframes bounceIn {
+			0% {
+				transform: scale(0.3);
+				opacity: 0;
+			}
+
+			50% {
+				transform: scale(1.1);
+				opacity: 1;
+			}
+
+			70% {
+				transform: scale(0.9);
+			}
+
+			100% {
+				transform: scale(1);
+			}
+		}
+
+		.error-container h1 {
+			font-size: 3rem;
+			/* Larger, more impactful heading */
+			color: #1a202c;
+			/* Darker heading color */
+			margin-bottom: 1rem;
+			font-weight: 700;
+			/* Bolder font */
+		}
+
+		.error-container p {
+			font-size: 1.2rem;
+			/* Larger paragraph text */
+			color: #4a5568;
+			/* Slightly lighter grey for paragraph */
+			margin-bottom: 2.5rem;
+			/* More space before buttons */
+			line-height: 1.6;
+		}
+
+		.error-code {
+			font-size: 1.1rem;
+			/* Slightly larger error code */
+			color: #a0aec0;
+			/* Lighter grey for error code */
+			margin-bottom: 1.5rem;
+			font-weight: 500;
+		}
+
+		.error-container .btn {
+			padding: 12px 30px;
+			/* Larger buttons */
+			font-size: 1.1rem;
+			/* Larger button text */
+			text-decoration: none;
+			border-radius: 8px;
+			/* More rounded buttons */
+			transition: all 0.3s ease;
+			/* Smooth transitions for hover effects */
+			display: inline-flex;
+			/* Align icon and text */
+			align-items: center;
+			gap: 8px;
+			/* Space between icon and text */
+			font-weight: 600;
+		}
+
+		.btn-home {
+			background-color: #3b82f6;
+			/* Tailwind blue-500 */
+			color: white;
+			margin-right: 15px;
+			/* More space between buttons */
+			box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+			/* Subtle shadow */
+		}
+
+		.btn-home:hover {
+			background-color: #2563eb;
+			/* Darker blue on hover */
+			transform: translateY(-2px);
+			/* Lift effect */
+			box-shadow: 0 6px 15px rgba(59, 130, 246, 0.4);
+		}
+
+		.btn-back {
+			background-color: #64748b;
+			/* Tailwind slate-500 */
+			color: white;
+			box-shadow: 0 4px 10px rgba(100, 116, 139, 0.3);
+		}
+
+		.btn-back:hover {
+			background-color: #475569;
+			/* Darker slate on hover */
+			transform: translateY(-2px);
+			box-shadow: 0 6px 15px rgba(100, 116, 139, 0.4);
+		}
+
+		/* Responsive adjustments */
+		@media (max-width: 768px) {
+			.error-container {
+				padding: 40px 20px;
+				margin: 1rem;
+				/* Add some margin on smaller screens */
+			}
+
+			.error-icon {
+				font-size: 5rem;
+			}
+
+			.error-container h1 {
+				font-size: 2.2rem;
+			}
+
+			.error-container p {
+				font-size: 1rem;
+			}
+
+			.error-container .btn {
+				width: 100%;
+				/* Full width buttons on small screens */
+				margin-right: 0;
+				margin-bottom: 15px;
+				/* Space between stacked buttons */
+			}
+
+			.btn-home {
+				margin-bottom: 15px;
+				/* Add margin to bottom of first button when stacked */
+			}
+
+			.btn-group-responsive {
+				display: flex;
+				flex-direction: column;
+				width: 100%;
+				align-items: center;
+				/* Center buttons */
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<div class="error-container">
+		<div class="error-icon">
+			<!-- Dynamic icon based on error code or a generic one -->
+			<i
+				th:classappend="${errorCode == '404'} ? 'fas fa-unlink' : (${errorCode == '500'} ? 'fas fa-server' : (${errorCode == '403'} ? 'fas fa-ban' : 'fas fa-exclamation-circle'))"></i>
+		</div>
+		<h1 th:text="${errorMessage ?: 'Oops! Something went wrong.'}">An Error Occurred</h1>
+		<p class="error-code" th:if="${errorCode}" th:text="'Error Code: ' + ${errorCode}">Error Code: N/A</p>
+		<p
+			th:text="${detailedMessage ?: 'We are sorry, but an unexpected error has occurred. Please try again later or contact support if the problem persists.'}">
+			An unexpected error has occurred.
+		</p>
+		<div class="btn-group-responsive">
+			<a th:href="@{/home}" class="btn btn-home"><i class="fas fa-home"></i> Go to Homepage</a>
+			<a href="javascript:history.back()" class="btn btn-back"><i class="fas fa-arrow-left"></i> Go Back</a>
+		</div>
+	</div>
+	<!-- Include footer -->
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

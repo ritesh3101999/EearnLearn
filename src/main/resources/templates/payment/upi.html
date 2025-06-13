@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>UPI Payment</title>
+	<link rel="stylesheet" href="/css/style.css">
+	<style>
+		.payment-container {
+			max-width: 600px;
+			margin: 2rem auto;
+			padding: 2rem;
+			border: 1px solid #ddd;
+			border-radius: 8px;
+			text-align: center;
+		}
+
+		.qr-code {
+			width: 300px;
+			height: 300px;
+			margin: 1rem 0;
+		}
+
+		.payment-details {
+			margin: 1rem 0;
+			padding: 1rem;
+			background: #f8f9fa;
+			border-radius: 4px;
+		}
+	</style>
+</head>
+
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<div class="payment-container">
+		<h2>Complete Payment via UPI</h2>
+
+		<!-- QR Code -->
+		<img th:src="${qrCodeUrl}" class="qr-code" alt="UPI QR Code">
+
+		<!-- Manual Payment Details -->
+		<div class="payment-details">
+			<h3>Or Pay Manually</h3>
+			<p>UPI ID: <strong th:text="${upiId}"></strong></p>
+			<p>Amount: ₹<span th:text="${#numbers.formatDecimal(amount, 0, 2)}"></span></p>
+			<p>Transaction ID: <code th:text="${transactionId}"></code></p>
+		</div>
+
+		<!-- Confirmation Form -->
+		<form th:action="@{/payment/confirm}" method="post">
+			<input type="hidden" name="transactionId" th:value="${transactionId}">
+			<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+			<button type="submit" class="btn btn-success">
+				I've Completed Payment
+			</button>
+
+			<a th:href="@{/cart}" class="btn btn-secondary">
+				Cancel
+			</a>
+		</form>
+
+		<!-- Payment Instructions -->
+		<div class="instructions" style="margin-top: 2rem; text-align: left;">
+			<h4>How to Pay:</h4>
+			<ol>
+				<li>Open your UPI app (Google Pay, PhonePe, Paytm, etc.)</li>
+				<li>Scan the QR code or enter UPI ID manually</li>
+				<li>Enter exact amount shown</li>
+				<li>Complete payment in your app</li>
+				<li>Click "I've Completed Payment" above</li>
+			</ol>
+		</div>
+	</div>
+</body>
+
+</html>

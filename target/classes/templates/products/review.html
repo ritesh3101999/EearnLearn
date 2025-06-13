@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<title>Product Details</title>
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<div class="container">
+		<!-- Product Details -->
+		<div class="product-details">
+			<h1 th:text="${product.name}"></h1>
+			<div class="product-rating">
+				<span class="average-rating"
+					th:text="${product.averageRating != null} ? ${#numbers.formatDecimal(product.averageRating, 1, 1)} : 'Not rated'">
+				</span>
+				<div class="stars">
+					<span th:each="i: ${#numbers.sequence(1, 5)}">
+						<i th:class="${i <= product.averageRating} ? 'fas fa-star' : 'far fa-star'"></i>
+					</span>
+				</div>
+				<span class="review-count"
+					th:text="'(' + ${product.reviews.size()} + ${product.reviews.size() == 1 ? ' review)' : ' reviews)'}">
+				</span>
+			</div>
+			<!-- Other product details -->
+		</div>
+
+		<!-- Error Message Display -->
+		<div th:if="${errorMessage}" class="alert alert-danger"
+			style="margin: 20px 0; padding: 15px; border-radius: 5px; background: #f8d7da; color: #721c24;">
+			<span th:text="${errorMessage}"></span>
+			<a th:href="@{/products/{productId}(productId=${product.id})}"
+				style="margin-left: 10px; color: #721c24; text-decoration: underline;">
+				Try again
+			</a>
+		</div>
+
+		<!-- Reviews Section -->
+		<section class="reviews-section">
+			<h2>Customer Reviews</h2>
+
+			<!-- Review Form -->
+			<div class="review-form" sec:authorize="isAuthenticated()">
+				<form th:action="@{/products/{productId}/reviews(productId=${product.id})}" method="post"
+					th:object="${newReview}">
+					<div class="form-group">
+						<label>Your Rating:</label>
+						<select th:field="*{rating}" class="form-control" required>
+							<option value="">Choose rating...</option>
+							<option value="5">★★★★★</option>
+							<option value="4">★★★★☆</option>
+							<option value="3">★★★☆☆</option>
+							<option value="2">★★☆☆☆</option>
+							<option value="1">★☆☆☆☆</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label>Your Review:</label>
+						<textarea th:field="*{comment}" class="form-control" rows="4" maxlength="500"></textarea>
+					</div>
+					<button type="submit" class="btn btn-primary">Submit Review</button>
+				</form>
+			</div>
+
+			<!-- Reviews List -->
+			<div class="reviews-list">
+				<div th:each="review : ${reviews}" class="review-card">
+					<div class="review-header">
+						<span class="user" th:text="${review.user.username}"></span>
+						<div class="stars">
+							<span th:each="i: ${#numbers.sequence(1, 5)}">
+								<i th:class="${i <= review.rating} ? 'fas fa-star' : 'far fa-star'"></i>
+							</span>
+						</div>
+						<span class="date" th:text="${#temporals.format(review.createdAt, 'dd MMM yyyy')}"></span>
+						<!-- Edit Button (only show to review owner) -->
+						<div class="review-actions" sec:authorize="isAuthenticated()">
+							<a th:href="@{/products/{productId}/reviews/edit/{reviewId}(productId=${product.id}, reviewId=${review.id})}"
+								class="btn btn-sm btn-outline-primary">
+								<i class="fas fa-edit"></i> Edit
+							</a>
+						</div>
+					</div>
+					<p class="comment" th:text="${review.comment}"></p>
+				</div>
+
+				<div th:if="${reviews.empty}" class="no-reviews">
+					<p>No reviews yet. Be the first to review this product!</p>
+				</div>
+			</div>
+		</section>
+	</div>
+</body>
+
+</html>

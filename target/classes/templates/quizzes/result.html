@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${quiz.title} + ' - Result'">Quiz Result</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .quiz-result-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .result-summary {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .result-summary h1 {
+            font-size: 2.5rem;
+            color: #007bff;
+        }
+        .score {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #28a745; /* Green for good score */
+            margin: 1rem 0;
+        }
+        .question-review-block {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+            text-align: left;
+        }
+        .question-review-block .question-text {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        .option-list {
+            list-style: none;
+            padding: 0;
+        }
+        .option-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #eee;
+            display: flex;
+            align-items: center;
+        }
+        .option-list li:last-child {
+            border-bottom: none;
+        }
+        .correct-answer {
+            color: #28a745; /* Green */
+            font-weight: bold;
+        }
+        .incorrect-answer {
+            color: #dc3545; /* Red */
+            font-weight: bold;
+        }
+        .selected-answer::before {
+            content: "\f058"; /* Check circle for selected */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            margin-right: 0.5rem;
+        }
+        .incorrect-answer.selected-answer::before {
+            content: "\f057"; /* Times circle for incorrect selected */
+            color: #dc3545;
+        }
+        .correct-answer.not-selected::before {
+            content: "\f058"; /* Check circle for correct not selected */
+            color: #28a745;
+        }
+        .action-buttons {
+            margin-top: 2rem;
+        }
+        .action-buttons .btn {
+            margin: 0 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    <div th:replace="~{fragments/messages :: messages}"></div>
+
+    <div class="quiz-result-container">
+        <div class="result-summary">
+            <h1 th:text="${quiz.title} + ' - Result'">Quiz Result</h1>
+            <p>Course: <a th:href="@{/courses/{id}(id=${course.id})}" th:text="${course.title}"></a></p>
+            <div class="score">
+                <span th:text="${score}"></span> / <span th:text="${totalQuestions}"></span>
+            </div>
+            <p th:if="${score == totalQuestions}" class="text-success">Congratulations! You got all questions correct!</p>
+            <p th:unless="${score == totalQuestions}" class="text-info">Review your answers below.</p>
+        </div>
+
+        <h2>Answer Review</h2>
+        <div th:each="question, stat : ${questions}" class="question-review-block">
+            <p class="question-text">
+                <span th:text="${stat.index + 1} + '. ' + ${question.questionText}">Question Text</span>
+            </p>
+            <ul class="option-list">
+                <li th:each="option, optionStat : ${question.options}"
+                    th:classappend="${(question.correctOptionIndex == optionStat.index ? 'correct-answer ' : '') +
+                                     (submittedAnswers[question.id] != null and submittedAnswers[question.id] == optionStat.index ? 'selected-answer ' : '') +
+                                     (question.correctOptionIndex != optionStat.index and submittedAnswers[question.id] != null and submittedAnswers[question.id] == optionStat.index ? 'incorrect-answer ' : '')}">
+                    <span th:text="${option}">Option Text</span>
+                </li>
+            </ul>
+            <div th:if="${submittedAnswers.containsKey(question.id)}">
+                <p th:if="${question.correctOptionIndex == submittedAnswers.get(question.id)}" class="text-success">
+                    <i class="fas fa-check-circle"></i> Your answer was correct.
+                </p>
+                <p th:unless="${question.correctOptionIndex == submittedAnswers.get(question.id)}" class="text-danger">
+                    <i class="fas fa-times-circle"></i> Your answer was incorrect.
+                    The correct answer was: <span th:text="${question.options[question.correctOptionIndex]}"></span>
+                </p>
+            </div>
+            <div th:unless="${submittedAnswers.containsKey(question.id)}">
+                <p class="text-warning">
+                    <i class="fas fa-exclamation-triangle"></i> You did not answer this question.
+                    The correct answer was: <span th:text="${question.options[question.correctOptionIndex]}"></span>
+                </p>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a th:href="@{/courses/{courseId}/quizzes/{quizId}/take(courseId=${course.id}, quizId=${quiz.id})}" class="btn btn-primary">
+                <i class="fas fa-redo"></i> Retake Quiz
+            </a>
+            <a th:href="@{/courses/{courseId}/quizzes(courseId=${course.id})}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Quizzes
+            </a>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title th:text="${course.id != null} ? 'Edit Course' : 'New Course'"></title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<style>
+		/* General body and container styling for consistency */
+		body {
+			font-family: 'Inter', sans-serif;
+			/* Assuming Inter font from global style.css or similar */
+			background-color: #f0f2f5;
+			color: #333;
+			line-height: 1.6;
+		}
+
+		.container {
+			max-width: 800px;
+			margin: 3rem auto;
+			padding: 2rem;
+			background-color: #ffffff;
+			border-radius: 12px;
+			box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+			border: 1px solid #e0e0e0;
+		}
+
+		h1 {
+			font-size: 2.2rem;
+			color: #2d3748;
+			margin-bottom: 2rem;
+			text-align: center;
+			font-weight: 700;
+		}
+
+		.form-group {
+			margin-bottom: 1.5rem;
+		}
+
+		.form-group label {
+			display: block;
+			margin-bottom: 0.6rem;
+			font-weight: 600;
+			color: #4a5568;
+			font-size: 1rem;
+		}
+
+		.form-control {
+			width: 100%;
+			padding: 12px 15px;
+			border: 1px solid #e1e5e9;
+			border-radius: 8px;
+			font-size: 1rem;
+			transition: all 0.3s ease;
+			box-sizing: border-box;
+			/* Ensures padding doesn't increase total width */
+		}
+
+		.form-control:focus {
+			outline: none;
+			border-color: #667eea;
+			box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+		}
+
+		textarea.form-control {
+			resize: vertical;
+			/* Allow vertical resizing */
+			min-height: 120px;
+		}
+
+		/* Button styling matching list.html */
+		.btn {
+			padding: 12px 24px;
+			border: none;
+			border-radius: 8px;
+			text-decoration: none;
+			font-weight: 600;
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			transition: all 0.3s ease;
+			cursor: pointer;
+			font-size: 1rem;
+		}
+
+		.btn-primary {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			color: white;
+			box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+		}
+
+		.btn-primary:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+		}
+
+		.btn-secondary {
+			background: #f8f9fa;
+			color: #667eea;
+			border: 2px solid #667eea;
+			margin-left: 1rem;
+		}
+
+		.btn-secondary:hover {
+			background: #667eea;
+			color: white;
+			transform: translateY(-2px);
+		}
+
+		/* Responsive adjustments */
+		@media (max-width: 768px) {
+			.container {
+				margin: 2rem 1rem;
+				padding: 1.5rem;
+			}
+
+			h1 {
+				font-size: 1.8rem;
+			}
+
+			.btn {
+				width: 100%;
+				margin-bottom: 0.8rem;
+				justify-content: center;
+			}
+
+			.btn-secondary {
+				margin-left: 0;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<div class="container">
+		<h1 th:text="${course.id != null} ? 'Edit Course' : 'Create New Course'"></h1>
+
+		<form th:action="@{/courses/save}" method="post" th:object="${course}">
+			<input type="hidden" th:field="*{id}">
+
+			<div class="form-group">
+				<label for="title">Title:</label>
+				<input type="text" id="title" th:field="*{title}" class="form-control" required>
+			</div>
+
+			<div class="form-group">
+				<label for="description">Description:</label>
+				<textarea id="description" th:field="*{description}" class="form-control" rows="4"></textarea>
+			</div>
+
+			<button type="submit" class="btn btn-primary">
+				<i class="fas fa-save"></i> Save Course
+			</button>
+			<a th:href="@{/courses}" class="btn btn-secondary">
+				<i class="fas fa-times-circle"></i> Cancel
+			</a>
+		</form>
+	</div>
+
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

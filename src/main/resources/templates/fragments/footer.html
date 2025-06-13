@@ -1,0 +1,32 @@
+<footer th:fragment="footer" class="main-footer">
+	<div class="footer-container">
+		<div class="footer-section">
+			<h4>About EarnLearn</h4>
+			<p>EarnLearn is your comprehensive platform for online education and a vibrant marketplace for unique
+				products. We empower learners and creators alike.</p>
+		</div>
+		<div class="footer-section">
+			<h4>Quick Links</h4>
+			<ul class="footer-links">
+				<li><a th:href="@{/home}">Home</a></li>
+				<li><a th:href="@{/marketplace}">Marketplace</a></li>
+				<li><a th:href="@{/courses}">Courses</a></li>
+				<li><a th:href="@{/notes}">Smart Notes</a></li>
+				<li><a th:href="@{/contact}">Contact Us</a></li>
+			</ul>
+		</div>
+		<div class="footer-section">
+			<h4>Connect With Us</h4>
+			<div class="social-icons">
+				<a href="#" target="_blank" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+				<a href="#" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+				<a href="#" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+				<a href="#" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+			</div>
+		</div>
+	</div>
+	<div class="footer-bottom">
+		&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2024</span> EarnLearn. All rights reserved.
+	</div>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</footer>

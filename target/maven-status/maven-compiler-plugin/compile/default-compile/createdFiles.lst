@@ -1,0 +1,17 @@
+com\earnlearn\controller\UserController.class
+com\earnlearn\service\RoleService.class
+com\earnlearn\controller\RoleController.class
+com\earnlearn\controller\DiscussionController.class
+com\earnlearn\service\DiscussionService.class
+com\earnlearn\model\Discussion.class
+com\earnlearn\security\SecurityConfig.class
+com\earnlearn\controller\HomeController.class
+com\earnlearn\repository\DiscussionRepository.class
+com\earnlearn\repository\RoleRepository.class
+com\earnlearn\model\User.class
+com\earnlearn\repository\UserRepository.class
+com\earnlearn\model\Role.class
+com\earnlearn\RoleSetting.class
+com\earnlearn\EarnLearnApplication.class
+com\earnlearn\service\UserService.class
+com\earnlearn\controller\DashboardController.class

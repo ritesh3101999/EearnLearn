@@ -1,0 +1,17 @@
+E:\Spring Boot Project\Earn learn (G12)\EarnLearn\src\main\java\com\earnlearn\controller\DashboardController.java
+E:\Spring Boot Project\Earn learn (G12)\EarnLearn\src\main\java\com\earnlearn\controller\DiscussionController.java
+E:\Spring Boot Project\Earn learn (G12)\EarnLearn\src\main\java\com\earnlearn\controller\HomeController.java
+E:\Spring Boot Project\Earn learn (G12)\EarnLearn\src\main\java\com\earnlearn\controller\RoleController.java
+E:\Spring Boot Project\Earn learn (G12)\EarnLearn\src\main\java\com\earnlearn\controller\UserController.java
+E:\Spring Boot Project\Earn learn (G12)\EarnLearn\src\main\java\com\earnlearn\EarnLearnApplication.java
+E:\Spring Boot Project\Earn learn (G12)\EarnLearn\src\main\java\com\earnlearn\model\Discussion.java
+E:\Spring Boot Project\Earn learn (G12)\EarnLearn\src\main\java\com\earnlearn\model\Role.java
+E:\Spring Boot Project\Earn learn (G12)\EarnLearn\src\main\java\com\earnlearn\model\User.java
+E:\Spring Boot Project\Earn learn (G12)\EarnLearn\src\main\java\com\earnlearn\repository\DiscussionRepository.java
+E:\Spring Boot Project\Earn learn (G12)\EarnLearn\src\main\java\com\earnlearn\repository\RoleRepository.java
+E:\Spring Boot Project\Earn learn (G12)\EarnLearn\src\main\java\com\earnlearn\repository\UserRepository.java
+E:\Spring Boot Project\Earn learn (G12)\EarnLearn\src\main\java\com\earnlearn\RoleSetting.java
+E:\Spring Boot Project\Earn learn (G12)\EarnLearn\src\main\java\com\earnlearn\security\SecurityConfig.java
+E:\Spring Boot Project\Earn learn (G12)\EarnLearn\src\main\java\com\earnlearn\service\DiscussionService.java
+E:\Spring Boot Project\Earn learn (G12)\EarnLearn\src\main\java\com\earnlearn\service\RoleService.java
+E:\Spring Boot Project\Earn learn (G12)\EarnLearn\src\main\java\com\earnlearn\service\UserService.java

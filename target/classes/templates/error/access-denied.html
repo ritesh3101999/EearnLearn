@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle ?: 'Access Denied'}">Access Denied</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { display: flex; flex-direction: column; min-height: 100vh; }
+        .error-container {
+            text-align: center;
+            padding: 40px 20px;
+            max-width: 600px;
+            margin: auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .error-icon {
+            font-size: 5rem;
+            color: #dc3545; /* Red for error */
+            margin-bottom: 1rem;
+        }
+        .error-container h1 {
+            font-size: 2.5rem;
+            color: #343a40;
+            margin-bottom: 0.5rem;
+        }
+        .error-container p {
+            font-size: 1.1rem;
+            color: #6c757d;
+            margin-bottom: 2rem;
+        }
+        .error-container .btn {
+            padding: 10px 25px;
+            font-size: 1rem;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .btn-home {
+            background-color: #007bff;
+            color: white;
+            margin-right: 10px;
+        }
+        .btn-home:hover {
+            background-color: #0056b3;
+        }
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-back:hover {
+            background-color: #545b62;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="error-container">
+        <div class="error-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        <h1 th:text="${errorMessage ?: 'Access Denied'}">Access Denied</h1>
+        <p th:text="${detailedMessage ?: 'You do not have permission to view this page.'}">
+            Sorry, you are not authorized to access this resource.
+        </p>
+        <div>
+            <a th:href="@{/home}" class="btn btn-home"><i class="fas fa-home"></i> Go to Homepage</a>
+            <a href="javascript:history.back()" class="btn btn-back"><i class="fas fa-arrow-left"></i> Go Back</a>
+        </div>
+    </div>
+
+    </body>
+</html>

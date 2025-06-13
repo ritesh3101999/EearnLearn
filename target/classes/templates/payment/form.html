@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Complete Payment - EarnLearn</title>
+	<style>
+		.payment-container {
+			max-width: 500px;
+			margin: 2rem auto;
+			padding: 2rem;
+			background: white;
+			border-radius: 12px;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		}
+
+		.qr-code {
+			margin: 1rem 0;
+			padding: 1rem;
+			background: #f8fafc;
+			border-radius: 8px;
+			text-align: center;
+		}
+
+		.qr-code svg {
+			max-width: 300px;
+			height: auto;
+		}
+
+		.payment-details {
+			margin: 1.5rem 0;
+			padding: 1rem;
+			background: #f8f9fa;
+			border-radius: 8px;
+		}
+
+		.payment-timer {
+			color: #64748b;
+			font-size: 0.9rem;
+			margin-top: 1rem;
+		}
+
+		.btn-primary {
+			background: #007bff;
+			color: white;
+			padding: 0.8rem 1.5rem;
+			border: none;
+			border-radius: 6px;
+			cursor: pointer;
+		}
+
+		.btn-secondary {
+			background: #6c757d;
+			color: white;
+			padding: 0.8rem 1.5rem;
+			border-radius: 6px;
+			text-decoration: none;
+			display: inline-block;
+			margin-left: 1rem;
+		}
+
+		.error-alert {
+			color: #dc3545;
+			padding: 1rem;
+			margin-bottom: 1rem;
+			border: 1px solid #f5c6cb;
+			border-radius: 4px;
+			background: #f8d7da;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="payment-container">
+		<!-- Error Message -->
+		<div th:if="${error}" class="error-alert" th:text="${error}"></div>
+
+		<!-- QR Code -->
+		<div class="qr-code" th:utext="${qrCode}"></div>
+
+		<!-- Payment Details -->
+		<div class="payment-details">
+			<p><strong>Amount:</strong> ₹<span th:text="${#numbers.formatDecimal(payment.amount, 1, 2)}"></span></p>
+			<p><strong>Transaction ID:</strong> <code th:text="${payment.transactionId}"></code></p>
+			<p class="payment-timer">
+				<strong>Expires at:</strong>
+				<span th:text="${#temporals.format(payment.expiresAt, 'HH:mm')}"></span>
+				(<span id="timer">15:00</span>)
+			</p>
+		</div>
+
+		<!-- Action Buttons -->
+		<form th:action="@{/payments/{id}/confirm(id=${payment.transactionId})}" method="post">
+			<button type="submit" class="btn-primary">Confirm Payment</button>
+			<a href="/" class="btn-secondary">Cancel</a>
+		</form>
+	</div>
+
+	<!-- JavaScript with Thymeleaf Inline Processing -->
+	<script th:inline="javascript">
+		/*<![CDATA[*/
+		try {
+			// Parse Thymeleaf-generated date
+			const expiryString = /*[[${#temporals.format(payment.expiresAt, 'yyyy-MM-dd''T''HH:mm:ss')}]]*/ '';
+			const expiryDate = new Date(expiryString.replace(' ', 'T'));
+			const timerElement = document.getElementById('timer');
+
+			function updateTimer() {
+				const now = new Date();
+				const diffMs = expiryDate - now;
+
+				if (diffMs <= 0) {
+					timerElement.textContent = "00:00";
+					window.location.reload();
+					return;
+				}
+
+				const minutes = Math.floor(diffMs / 60000);
+				const seconds = Math.floor((diffMs % 60000) / 1000);
+				timerElement.textContent =
+					`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+			}
+
+			if (expiryString && timerElement) {
+				setInterval(updateTimer, 1000);
+				updateTimer();
+			}
+		} catch (error) {
+			console.error('Timer initialization error:', error);
+			const timerElement = document.getElementById('timer');
+			if (timerElement) {
+				timerElement.textContent = "--:--";
+			}
+		}
+		/*]]>*/
+	</script>
+</body>
+
+</html>

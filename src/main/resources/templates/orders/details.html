@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Order Details</title>
+	<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+	<div th:replace="~{fragments/messages :: messages}"></div>
+
+	<div class="container">
+		<h1>Order #<span th:text="${order.id}"></span></h1>
+		<p>Date: <span th:text="${#temporals.format(order.orderDate, 'dd MMM yyyy HH:mm')}"></span></p>
+		<p>Status: <span th:text="${order.status}"></span></p>
+
+		<div class="order-items">
+			<div th:each="item : ${order.items}" class="item">
+				<img th:src="${item.product.imageUrl}" class="product-image">
+				<div class="item-details">
+					<h3 th:text="${item.product.name}"></h3>
+					<p>Price: ₹<span th:text="${item.priceAtPurchase}"></span></p>
+					<p>Quantity: <span th:text="${item.quantity}"></span></p>
+				</div>
+			</div>
+		</div>
+
+		<h3>Total: ₹<span th:text="${#aggregates.sum(order.items.![priceAtPurchase * quantity])}"></span></h3>
+	</div>
+</body>
+
+</html>

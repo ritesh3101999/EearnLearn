@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<title th:text="${course.title}"></title>
+	<link rel="stylesheet" href="/css/style.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<style>
+		.course-detail-container {
+			max-width: 900px;
+			margin: 2rem auto;
+			padding: 2rem;
+			background-color: #fff;
+			border-radius: 8px;
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+		}
+
+		.course-header {
+			margin-bottom: 2rem;
+			padding-bottom: 1rem;
+			border-bottom: 1px solid #eee;
+			display: flex;
+			/* Added for alignment */
+			justify-content: space-between;
+			/* Added for alignment */
+			align-items: center;
+			/* Added for alignment */
+			flex-wrap: wrap;
+			/* Allow wrapping on small screens */
+		}
+
+		.course-header h1 {
+			font-size: 2rem;
+			color: #333;
+			margin-bottom: 0.5rem;
+			/* Adjust margin */
+		}
+
+		.course-header p {
+			width: 100%;
+			/* Make description take full width below title */
+		}
+
+		.section-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-top: 2rem;
+			margin-bottom: 1.5rem;
+			padding-bottom: 0.5rem;
+			border-bottom: 1px solid #f0f0f0;
+		}
+
+		.section-header h2 {
+			margin: 0;
+			font-size: 1.5rem;
+			color: #444;
+		}
+
+		.item-card {
+			background: #f8f9fa;
+			border-radius: 8px;
+			padding: 1rem;
+			margin-bottom: 0.75rem;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.item-card h3 {
+			margin: 0;
+			font-size: 1.1rem;
+			color: #007bff;
+		}
+
+		.item-card .actions {
+			display: flex;
+			gap: 0.5rem;
+		}
+
+		.item-card .actions .btn {
+			padding: 0.4rem 0.8rem;
+			font-size: 0.8rem;
+		}
+
+		.enrollment-status {
+			margin-left: 1rem;
+			font-size: 1.1rem;
+			font-weight: bold;
+		}
+
+		.enrollment-status.enrolled {
+			color: #28a745;
+			/* Green for enrolled */
+		}
+
+		.enrollment-status.not-enrolled {
+			color: #ffc107;
+			/* Orange for not enrolled */
+		}
+
+		@media (max-width: 768px) {
+			.course-header {
+				flex-direction: column;
+				align-items: flex-start;
+			}
+
+			.course-header .btn-group {
+				margin-top: 1rem;
+				width: 100%;
+				display: flex;
+				justify-content: center;
+			}
+
+			.enrollment-status {
+				margin-left: 0;
+				margin-top: 0.5rem;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+	<div th:replace="~{fragments/messages :: messages}"></div>
+
+	<div class="course-detail-container">
+		<div class="course-header">
+			<div>
+				<h1 th:text="${course.title}"></h1>
+				<p th:text="${course.description}"></p>
+				<p>Instructor: <strong th:text="${course.instructor?.name ?: 'N/A'}"></strong></p>
+				<p>Category: <strong th:text="${course.category?.name ?: 'N/A'}"></strong></p>
+			</div>
+			<div sec:authorize="isAuthenticated()" class="btn-group">
+				<span th:if="${isEnrolled}" class="enrollment-status enrolled">
+					<i class="fas fa-check-circle"></i> Enrolled
+				</span>
+				<form th:unless="${isEnrolled}" th:action="@{/enrollments/enroll/{courseId}(courseId=${course.id})}"
+					method="post">
+					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+					<button type="submit" class="btn btn-success">
+						<i class="fas fa-plus-circle"></i> Enroll Now
+					</button>
+				</form>
+			</div>
+		</div>
+
+		<div class="section-header">
+			<h2>Lectures</h2>
+			<!-- Only allow instructors/admins to add lectures -->
+			<a th:if="${currentUser != null and (currentUser.hasRole('INSTRUCTOR') or currentUser.hasRole('ADMIN'))}"
+				th:href="@{/courses/{courseId}/lectures/new(courseId=${course.id})}" class="btn btn-primary btn-sm">
+				<i class="fas fa-plus"></i> Add Lecture
+			</a>
+		</div>
+		<div class="lecture-list">
+			<div th:if="${course.lectures.isEmpty()}" class="alert alert-info">
+				No lectures added to this course yet.
+			</div>
+			<div th:unless="${course.lectures.isEmpty()}" th:each="lecture : ${course.lectures}" class="item-card">
+				<h3 th:text="${lecture.title}"></h3>
+				<div class="actions">
+					<!-- Only allow enrolled users to view lectures -->
+					<a th:if="${isEnrolled}" th:href="@{/lectures}" class="btn btn-info btn-sm">
+						<i class="fas fa-eye"></i> View Content
+					</a>
+					<span th:unless="${isEnrolled}" class="text-muted">Enroll to view</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="section-header">
+			<h2>Quizzes</h2>
+			<!-- Only allow instructors/admins to create quizzes -->
+			<a th:if="${currentUser != null and (currentUser.hasRole('INSTRUCTOR') or currentUser.hasRole('ADMIN'))}"
+				th:href="@{/courses/{courseId}/quizzes/new(courseId=${course.id})}" class="btn btn-primary btn-sm">
+				<i class="fas fa-plus"></i> Create New Quiz
+				</button>
+			</a>
+		</div>
+		<div class="quiz-list">
+			<div th:if="${quizzes.isEmpty()}" class="alert alert-info">
+				No quizzes added to this course yet.
+			</div>
+			<div th:unless="${quizzes.isEmpty()}" th:each="quiz : ${quizzes}" class="item-card">
+				<h3 th:text="${quiz.title}"></h3>
+				<div class="actions">
+					<!-- Only allow enrolled users to view/take quizzes -->
+					<a th:if="${isEnrolled}"
+						th:href="@{/courses/{courseId}/quizzes/{quizId}(courseId=${course.id}, quizId=${quiz.id})}"
+						class="btn btn-info btn-sm">
+						<i class="fas fa-eye"></i> View/Edit
+					</a>
+					<a th:if="${isEnrolled}"
+						th:href="@{/courses/{courseId}/quizzes/{quizId}/take(courseId=${course.id}, quizId=${quiz.id})}"
+						class="btn btn-success btn-sm">
+						<i class="fas fa-play"></i> Take
+					</a>
+					<span th:unless="${isEnrolled}" class="text-muted">Enroll to take quiz</span>
+				</div>
+			</div>
+		</div>
+
+		<a th:href="@{/courses}" class="btn btn-secondary mt-3">
+			<i class="fas fa-arrow-left"></i> Back to Courses
+		</a>
+	</div>
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

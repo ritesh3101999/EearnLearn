@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle ?: 'Edit User'}">Edit User</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     <style>
+        .admin-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-check-label { margin-left: 0.5rem; }
+        .btn-toolbar { margin-top: 1.5rem; }
+        .alert { margin-bottom: 1.5rem; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="admin-container">
+        <h1 th:text="${pageTitle ?: 'Edit User'}">Edit User</h1>
+        <p>Editing user: <strong th:text="${user.username}"></strong></p>
+
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+        <form th:action="@{/admin/users/update/{id}(id=${user.id})}" th:object="${user}" method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <input type="hidden" th:field="*{id}" />
+            <input type="hidden" th:field="*{username}" /> <input type="hidden" th:field="*{password}" /> <div class="form-group">
+                <label for="name">Full Name:</label>
+                <input type="text" id="name" th:field="*{name}" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" th:field="*{email}" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="dateOfBirth">Date of Birth:</label>
+                <input type="date" id="dateOfBirth" th:field="*{dateOfBirth}" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label for="gender">Gender:</label>
+                <select id="gender" th:field="*{gender}" class="form-control">
+                    <option value="">Select Gender</option>
+                    <option value="MALE">Male</option>
+                    <option value="FEMALE">Female</option>
+                    <option value="OTHER">Other</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Roles:</label>
+                <div th:each="role : ${allRoles}" class="form-check">
+                    <input type="checkbox" class="form-check-input"
+                           name="roleNames" th:value="${role.name}"
+                           th:id="${'role-' + role.id}"
+                           th:checked="${userRoleNames.contains(role.name)}">
+                    <label class="form-check-label" th:for="${'role-' + role.id}" th:text="${role.name}">ROLE</label>
+                </div>
+                 <small class="form-text text-muted">Select the roles for this user.</small>
+            </div>
+
+            <div class="btn-toolbar">
+                <button type="submit" class="btn btn-primary me-2"><i class="fas fa-save"></i> Save Changes</button>
+                <a th:href="@{/admin/users}" class="btn btn-secondary"><i class="fas fa-times"></i> Cancel</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Manage Lecture</title>
+	<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<div class="container">
+		<h1 th:text="${lecture.id != null} ? 'Edit Lecture' : 'Create New Lecture'"></h1>
+		
+		<form th:action="@{${lecture.id == null} ? 
+		              '/products/' + ${productId} + '/lectures/save' : 
+		              '/products/' + ${productId} + '/lectures/update'}" method="post">
+
+			<input type="hidden" th:field="*{lecture.id}">
+
+			<div class="form-group">
+				<label>Title</label>
+				<input type="text" th:field="*{lecture.title}" required>
+			</div>
+
+			<div class="form-group">
+				<label>Lesson Order</label>
+				<input type="number" th:field="*{lecture.lessonOrder}" required>
+			</div>
+
+			<div class="form-group">
+				<label>Video URL</label>
+				<input type="url" th:field="*{lecture.videoUrl}">
+				<small>Enter YouTube embed URL (e.g. https://www.youtube.com/embed/VIDEO_ID)</small>
+			</div>
+
+			<div class="form-group">
+				<label>Content</label>
+				<textarea th:field="*{lecture.content}" rows="6" required></textarea>
+			</div>
+
+			<button type="submit" class="btn btn-primary">Save</button>
+			<a th:href="@{/products/{productId}/lectures(productId=${productId})}" class="btn btn-secondary">Cancel</a>
+		</form>
+	</div>
+</body>
+
+</html>

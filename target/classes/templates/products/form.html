@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Product</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">  
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Custom styles without Tailwind CSS */
+        body {
+            font-family: Arial, sans-serif; /* Fallback to a common sans-serif font */
+            background-color: #f8fafc; /* Light background */
+            color: #1e293b; /* Dark text */
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2.5rem;
+            background-color: #ffffff;
+            border-radius: 12px; /* Rounded corners */
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* Soft shadow */
+        }
+        h1 {
+            color: #1a202c; /* Darker heading */
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 2.5rem; /* Larger heading */
+            font-weight: 700;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            color: #4a5568; /* Label color */
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #e2e8f0; /* Light border */
+            border-radius: 8px; /* Rounded input fields */
+            font-size: 1rem;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+        .form-control:focus {
+            border-color: #3b82f6; /* Blue focus border */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25); /* Focus ring */
+            outline: none;
+        }
+        textarea.form-control {
+            min-height: 120px; /* Ample space for description */
+            resize: vertical;
+        }
+        .btn-primary {
+            background-color: #22c55e; /* Green primary button */
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 8px; /* Rounded button */
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            width: 100%; /* Full width on small screens */
+            display: block; /* Ensures button takes full width */
+            margin-top: 1.5rem; /* Space above button */
+        }
+        .btn-primary:hover {
+            background-color: #16a34a; /* Darker green on hover */
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+        /* Responsive adjustments for button */
+        @media (min-width: 768px) {
+            .btn-primary {
+                width: auto; /* Auto width on larger screens */
+                display: inline-block; /* Allows button to shrink */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Include header fragment (Assuming this Thymeleaf fragment exists) -->
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container">
+        <h1>Add New Product</h1>
+        <!-- Form for adding a new product -->
+        <form th:action="@{/products/save}" th:object="${product}" method="post">
+            <!-- Product Name -->
+            <div class="form-group">
+                <label for="name">Product Name</label>
+                <input type="text" id="name" th:field="*{name}" class="form-control" required
+                       placeholder="Enter product name">
+            </div>
+            
+            <!-- Description -->
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" th:field="*{description}" class="form-control"
+                          placeholder="Provide a detailed description of the product"></textarea>
+            </div>
+
+            <!-- Price -->
+            <div class="form-group">
+                <label for="price">Price</label>
+                <input type="number" id="price" th:field="*{price}" class="form-control" step="0.01" required
+                       placeholder="e.g., 99.99">
+            </div>
+
+            <!-- Image URL -->
+            <div class="form-group">
+                <label for="imageUrl">Image URL</label>
+                <input type="url" id="imageUrl" th:field="*{imageUrl}" class="form-control"
+                       placeholder="https://example.com/product-image.jpg">
+            </div>
+
+            <!-- Category -->
+            <div class="form-group">
+                <label for="category">Category</label>
+                <input type="text" id="category" th:field="*{category}" class="form-control"
+                       placeholder="e.g., Electronics, Books, Clothing">
+            </div>
+
+            <!-- Stock Quantity -->
+            <div class="form-group">
+                <label for="stock">Stock Quantity</label>
+                <input type="number" id="stock" th:field="*{stock}" class="form-control" required
+                       placeholder="e.g., 100">
+            </div>
+
+            <!-- Save Product Button -->
+            <button type="submit" class="btn-primary">Save Product</button>
+        </form>
+    </div>
+
+    <!-- Include messages fragment for flash messages (assuming this Thymeleaf fragment exists) -->
+    <div th:replace="fragments/messages :: messages"></div>
+    <!-- Include footer fragment (assuming this Thymeleaf fragment exists) -->
+    <div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

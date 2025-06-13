@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Add Lecture</title>
+	<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+	<div class="container">
+		<h1>Add New Lecture</h1>
+		<form th:action="@{/courses/{courseId}/lectures/save(courseId=${courseId})}" method="post"
+			th:object="${lecture}">
+			<div class="form-group">
+				<label>Title:</label>
+				<input type="text" th:field="*{title}" required>
+			</div>
+			<div class="form-group">
+				<label>Content:</label>
+				<textarea th:field="*{content}" rows="5" required></textarea>
+			</div>
+			<button type="submit" class="btn btn-primary">Save Lecture</button>
+			<a th:href="@{/courses/{courseId}(courseId=${courseId})}" class="btn btn-secondary">Cancel</a>
+		</form>
+	</div>
+</body>
+
+</html>

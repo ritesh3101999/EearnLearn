@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Shipping Details - EarnLearn</title>
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<style>
+		:root {
+			--primary-color: #2563eb;
+			--primary-hover: #1d4ed8;
+			--success-color: #059669;
+			--success-hover: #047857;
+			--danger-color: #dc2626;
+			--warning-color: #d97706;
+			--gray-50: #f9fafb;
+			--gray-100: #f3f4f6;
+			--gray-200: #e5e7eb;
+			--gray-300: #d1d5db;
+			--gray-400: #9ca3af;
+			--gray-500: #6b7280;
+			--gray-600: #4b5563;
+			--gray-700: #374151;
+			--gray-800: #1f2937;
+			--gray-900: #111827;
+			--border-radius: 12px;
+			--shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+			--shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+			--shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+			--shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+			background: linear-gradient(135deg, var(--gray-50) 0%, #e0f2fe 100%);
+			margin: 0;
+			padding: 0;
+			min-height: 100vh;
+			color: var(--gray-800);
+			line-height: 1.6;
+			margin-top: 8%;
+		}
+
+		.shipping-container {
+			max-width: 1000px;
+			margin: 2rem auto;
+			padding: 0 1rem;
+			display: grid;
+			grid-template-columns: 1fr 400px;
+			gap: 2rem;
+			align-items: start;
+		}
+
+		.main-content {
+			background: white;
+			border-radius: var(--border-radius);
+			box-shadow: var(--shadow-lg);
+			overflow: hidden;
+			border: 1px solid var(--gray-200);
+		}
+
+		.page-header {
+			background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+			color: white;
+			padding: 2rem;
+			text-align: center;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.page-header::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="20" r="2" fill="white" opacity="0.1"/><circle cx="20" cy="60" r="1.5" fill="white" opacity="0.1"/><circle cx="80" cy="40" r="1" fill="white" opacity="0.1"/></svg>');
+			pointer-events: none;
+		}
+
+		.page-header h1 {
+			margin: 0;
+			font-size: 2.5rem;
+			font-weight: 700;
+			position: relative;
+			z-index: 1;
+		}
+
+		.page-header .subtitle {
+			margin: 0.5rem 0 0 0;
+			font-size: 1.1rem;
+			opacity: 0.9;
+			position: relative;
+			z-index: 1;
+		}
+
+		.form-content {
+			padding: 2rem;
+		}
+
+		.progress-indicator {
+			display: flex;
+			justify-content: center;
+			margin-bottom: 2rem;
+			padding: 0;
+			list-style: none;
+		}
+
+		.progress-step {
+			display: flex;
+			align-items: center;
+			color: var(--gray-400);
+			font-size: 0.875rem;
+			font-weight: 500;
+		}
+
+		.progress-step.active {
+			color: var(--primary-color);
+		}
+
+		.progress-step.completed {
+			color: var(--success-color);
+		}
+
+		.step-circle {
+			width: 32px;
+			height: 32px;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin-right: 0.5rem;
+			border: 2px solid currentColor;
+			font-weight: 600;
+			font-size: 0.875rem;
+		}
+
+		.step-circle.completed {
+			background: var(--success-color);
+			border-color: var(--success-color);
+			color: white;
+		}
+
+		.step-circle.active {
+			background: var(--primary-color);
+			border-color: var(--primary-color);
+			color: white;
+		}
+
+		.progress-connector {
+			width: 50px;
+			height: 2px;
+			background: var(--gray-300);
+			margin: 0 1rem;
+			align-self: center;
+		}
+
+		.progress-connector.completed {
+			background: var(--success-color);
+		}
+
+		.form-section {
+			margin-bottom: 2rem;
+			border: 1px solid var(--gray-200);
+			border-radius: var(--border-radius);
+			overflow: hidden;
+			background: var(--gray-50);
+		}
+
+		.section-header {
+			background: white;
+			padding: 1.5rem;
+			border-bottom: 1px solid var(--gray-200);
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+		}
+
+		.section-header h2 {
+			margin: 0;
+			font-size: 1.25rem;
+			font-weight: 600;
+			color: var(--gray-800);
+		}
+
+		.section-icon {
+			width: 24px;
+			height: 24px;
+			color: var(--primary-color);
+		}
+
+		.section-content {
+			padding: 1.5rem;
+			background: white;
+		}
+
+		.form-row {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		.form-row.single {
+			grid-template-columns: 1fr;
+		}
+
+		.form-group {
+			margin-bottom: 1.5rem;
+		}
+
+		.form-group:last-child {
+			margin-bottom: 0;
+		}
+
+		.form-label {
+			display: block;
+			margin-bottom: 0.5rem;
+			font-weight: 500;
+			color: var(--gray-700);
+			font-size: 0.875rem;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+		}
+
+		.form-control {
+			width: 100%;
+			padding: 0.875rem 1rem;
+			border: 2px solid var(--gray-300);
+			border-radius: 8px;
+			font-size: 1rem;
+			transition: all 0.2s ease;
+			background: white;
+			font-family: inherit;
+		}
+
+		.form-control:focus {
+			border-color: var(--primary-color);
+			outline: 0;
+			box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+			transform: translateY(-1px);
+		}
+
+		.form-control:invalid {
+			border-color: var(--danger-color);
+		}
+
+		.form-control:valid {
+			border-color: var(--success-color);
+		}
+
+		.invalid-feedback {
+			color: var(--danger-color);
+			font-size: 0.875rem;
+			margin-top: 0.5rem;
+			display: flex;
+			align-items: center;
+			gap: 0.25rem;
+		}
+
+		.input-group {
+			position: relative;
+		}
+
+		.input-icon {
+			position: absolute;
+			left: 12px;
+			top: 50%;
+			transform: translateY(-50%);
+			color: var(--gray-400);
+			pointer-events: none;
+		}
+
+		.input-group .form-control {
+			padding-left: 2.5rem;
+		}
+
+		.order-sidebar {
+			position: sticky;
+			top: 2rem;
+			height: fit-content;
+		}
+
+		.order-summary {
+			background: white;
+			border-radius: var(--border-radius);
+			box-shadow: var(--shadow-lg);
+			border: 1px solid var(--gray-200);
+			overflow: hidden;
+		}
+
+		.summary-header {
+			background: linear-gradient(135deg, var(--gray-800) 0%, var(--gray-700) 100%);
+			color: white;
+			padding: 1.5rem;
+			text-align: center;
+		}
+
+		.summary-header h2 {
+			margin: 0;
+			font-size: 1.25rem;
+			font-weight: 600;
+		}
+
+		.summary-content {
+			padding: 1.5rem;
+		}
+
+		.cart-item-summary {
+			display: flex;
+			align-items: center;
+			padding: 1rem;
+			margin-bottom: 1rem;
+			background: var(--gray-50);
+			border-radius: 8px;
+			border: 1px solid var(--gray-200);
+			transition: all 0.2s ease;
+		}
+
+		.cart-item-summary:hover {
+			transform: translateY(-1px);
+			box-shadow: var(--shadow-md);
+		}
+
+		.cart-item-summary:last-child {
+			margin-bottom: 0;
+		}
+
+		.item-image {
+			width: 60px;
+			height: 60px;
+			border-radius: 8px;
+			object-fit: cover;
+			margin-right: 1rem;
+			border: 2px solid var(--gray-200);
+		}
+
+		.item-info {
+			flex-grow: 1;
+		}
+
+		.item-name {
+			margin: 0 0 0.25rem 0;
+			font-size: 1rem;
+			font-weight: 600;
+			color: var(--gray-800);
+			line-height: 1.4;
+		}
+
+		.item-details {
+			margin: 0;
+			font-size: 0.875rem;
+			color: var(--gray-600);
+		}
+
+		.item-price {
+			font-weight: 700;
+			color: var(--success-color);
+			font-size: 1.1rem;
+			white-space: nowrap;
+		}
+
+		.summary-divider {
+			height: 1px;
+			background: var(--gray-200);
+			margin: 1.5rem 0;
+		}
+
+		.summary-row {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 0.75rem;
+			font-size: 0.875rem;
+		}
+
+		.summary-row:last-child {
+			margin-bottom: 0;
+		}
+
+		.summary-row.total {
+			font-size: 1.25rem;
+			font-weight: 700;
+			color: var(--primary-color);
+			padding-top: 1rem;
+			border-top: 2px solid var(--gray-200);
+			margin-top: 1rem;
+		}
+
+		.btn-checkout-final {
+			background: linear-gradient(135deg, var(--success-color) 0%, var(--success-hover) 100%);
+			color: white;
+			padding: 1rem 2rem;
+			font-size: 1.1rem;
+			font-weight: 600;
+			border-radius: 8px;
+			border: none;
+			cursor: pointer;
+			width: 100%;
+			margin-top: 2rem;
+			transition: all 0.2s ease;
+			text-transform: uppercase;
+			letter-spacing: 0.05em;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.btn-checkout-final:hover {
+			transform: translateY(-2px);
+			box-shadow: var(--shadow-lg);
+		}
+
+		.btn-checkout-final:active {
+			transform: translateY(0);
+		}
+
+		.btn-back-to-cart {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 0.5rem;
+			width: 100%;
+			padding: 0.875rem 1.5rem;
+			margin-top: 1rem;
+			text-align: center;
+			color: var(--gray-600);
+			border: 2px solid var(--gray-300);
+			border-radius: 8px;
+			text-decoration: none;
+			transition: all 0.2s ease;
+			font-weight: 500;
+		}
+
+		.btn-back-to-cart:hover {
+			background: var(--gray-100);
+			border-color: var(--gray-400);
+			color: var(--gray-700);
+			transform: translateY(-1px);
+		}
+
+		.security-badge {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			padding: 0.75rem;
+			background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+			border: 1px solid #0284c7;
+			border-radius: 8px;
+			margin-top: 1rem;
+			font-size: 0.875rem;
+			color: #0369a1;
+		}
+
+		.security-icon {
+			color: #0284c7;
+		}
+
+		.empty-cart {
+			text-align: center;
+			padding: 3rem 2rem;
+			color: var(--gray-500);
+		}
+
+		.empty-cart i {
+			font-size: 4rem;
+			margin-bottom: 1rem;
+			color: var(--gray-300);
+		}
+
+		/* Responsive Design */
+		@media (max-width: 768px) {
+			.shipping-container {
+				grid-template-columns: 1fr;
+				margin: 1rem auto;
+				padding: 0 0.5rem;
+			}
+
+			.order-sidebar {
+				order: -1;
+				position: static;
+			}
+
+			.form-row {
+				grid-template-columns: 1fr;
+				gap: 0;
+			}
+
+			.page-header h1 {
+				font-size: 2rem;
+			}
+
+			.progress-indicator {
+				flex-direction: column;
+				gap: 0.5rem;
+			}
+
+			.progress-connector {
+				display: none;
+			}
+		}
+
+		/* Focus styles for accessibility */
+		.btn-checkout-final:focus,
+		.btn-back-to-cart:focus {
+			outline: 2px solid var(--primary-color);
+			outline-offset: 2px;
+		}
+
+		/* Animation for form validation */
+		@keyframes shake {
+
+			0%,
+			100% {
+				transform: translateX(0);
+			}
+
+			25% {
+				transform: translateX(-5px);
+			}
+
+			75% {
+				transform: translateX(5px);
+			}
+		}
+
+		.form-control:invalid:focus {
+			animation: shake 0.3s ease-in-out;
+		}
+	</style>
+</head>
+
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+	<div th:replace="~{fragments/messages :: messages}"></div>
+
+	<div class="shipping-container">
+		<div class="main-content">
+			<div class="page-header">
+				<h1><i class="fas fa-shipping-fast"></i> Secure Checkout</h1>
+				<p class="subtitle">Confirm Your Order & Shipping Details</p>
+			</div>
+
+			<div class="form-content">
+				<ol class="progress-indicator">
+					<li class="progress-step completed">
+						<div class="step-circle completed">
+							<i class="fas fa-check"></i>
+						</div>
+						Cart
+					</li>
+					<div class="progress-connector completed"></div>
+					<li class="progress-step active">
+						<div class="step-circle active">2</div>
+						Shipping
+					</li>
+					<div class="progress-connector"></div>
+					<li class="progress-step">
+						<div class="step-circle">3</div>
+						Payment
+					</li>
+				</ol>
+
+				<form th:action="@{/orders/place}" th:object="${order}" method="post">
+					<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+					<div class="form-section">
+						<div class="section-header">
+							<i class="fas fa-map-marker-alt section-icon"></i>
+							<h2>Delivery Address</h2>
+						</div>
+
+						<div class="section-content">
+							<div class="form-row single">
+								<div class="form-group">
+									<label for="shippingAddress" class="form-label">
+										<i class="fas fa-home"></i> Street Address
+									</label>
+									<div class="input-group">
+										<i class="fas fa-map-marker input-icon"></i>
+										<input type="text" id="shippingAddress" th:field="*{shippingAddress}"
+											class="form-control" placeholder="House number, street name, apartment"
+											required autocomplete="street-address">
+									</div>
+									<div class="invalid-feedback" th:if="${#fields.hasErrors('shippingAddress')}"
+										th:errors="*{shippingAddress}">
+										<i class="fas fa-exclamation-triangle"></i>
+									</div>
+								</div>
+							</div>
+
+							<div class="form-row">
+								<div class="form-group">
+									<label for="shippingCity" class="form-label">
+										<i class="fas fa-building"></i>City
+									</label>
+									<div class="input-group">
+										<i class="fas fa-city input-icon"></i>
+										<input type="text" id="shippingCity" th:field="*{shippingCity}"
+											class="form-control" placeholder="Enter city" required
+											autocomplete="address-level2">
+									</div>
+									<div class="invalid-feedback" th:if="${#fields.hasErrors('shippingCity')}"
+										th:errors="*{shippingCity}">
+										<i class="fas fa-exclamation-triangle"></i>
+									</div>
+								</div>
+
+								<div class="form-group">
+									<label for="shippingState" class="form-label">
+										<i class="fas fa-flag"></i>State
+									</label>
+									<div class="input-group">
+										<i class="fas fa-map input-icon"></i>
+										<input type="text" id="shippingState" th:field="*{shippingState}"
+											class="form-control" placeholder="Enter state" required
+											autocomplete="address-level1">
+									</div>
+									<div class="invalid-feedback" th:if="${#fields.hasErrors('shippingState')}"
+										th:errors="*{shippingState}">
+										<i class="fas fa-exclamation-triangle"></i>
+									</div>
+								</div>
+							</div>
+
+							<div class="form-row">
+								<div class="form-group">
+									<label for="shippingZip" class="form-label">
+										<i class="fas fa-mail-bulk"></i> ZIP Code
+									</label>
+									<div class="input-group">
+										<i class="fas fa-envelope input-icon"></i>
+										<input type="text" id="shippingZip" th:field="*{shippingZip}"
+											class="form-control" placeholder="Enter ZIP code" required
+											pattern="[0-9]{5,6}" autocomplete="postal-code">
+									</div>
+									<div class="invalid-feedback" th:if="${#fields.hasErrors('shippingZip')}"
+										th:errors="*{shippingZip}">
+										<i class="fas fa-exclamation-triangle"></i>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<button type="submit" class="btn-checkout-final">
+						<i class="fas fa-credit-card"></i> Continue to Payment
+					</button>
+
+					<a th:href="@{/cart}" class="btn-back-to-cart">
+						<i class="fas fa-arrow-left"></i> Back to Cart
+					</a>
+				</form>
+			</div>
+		</div>
+
+		<div class="order-sidebar">
+			<div class="order-summary">
+				<div class="summary-header">
+					<h2><i class="fas fa-receipt"></i> Order Summary</h2>
+				</div>
+				<div class="summary-content">
+					<div th:if="${cart.items.isEmpty()}" class="empty-cart">
+						<i class="fas fa-shopping-cart"></i>
+						<p>Your cart is empty.</p>
+					</div>
+
+					<div th:each="item : ${cart.items}" class="cart-item-summary">
+						<img th:src="${item.product.imageUrl}" alt="Product Image" class="item-image"
+							onerror="this.onerror=null;this.src='https://placehold.co/60x60/EEE/333?text=NoImg';" />
+						<div class="item-info">
+							<h4 class="item-name" th:text="${item.product.name}">Product Name</h4>
+							<p class="item-details">Qty: <span th:text="${item.quantity}"></span></p>
+						</div>
+						<span class="item-price">₹<span
+								th:text="${#numbers.formatDecimal(item.product.price * item.quantity, 1, 2)}">0.00</span></span>
+					</div>
+
+					<div class="summary-divider"></div>
+
+					<div class="summary-row">
+						<span>Subtotal:</span>
+						<span>₹<span th:text="${#numbers.formatDecimal(cartTotal ?: 0, 1, 2)}">0.00</span></span>
+					</div>
+					<div class="summary-row">
+						<span>Shipping:</span>
+						<span class="text-success">FREE</span>
+					</div>
+					<div class="summary-row total">
+						<span>Total:</span>
+						<span>₹<span th:text="${#numbers.formatDecimal(cartTotal, 1, 2)}">0.00</span></span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

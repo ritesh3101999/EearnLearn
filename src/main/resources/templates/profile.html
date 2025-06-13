@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle ?: 'My Profile'}">My Profile</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .profile-container {
+            max-width: 700px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .profile-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .profile-header h1 {
+            font-size: 1.8rem;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            font-size: 1rem;
+            box-sizing: border-box; /* Ensures padding doesn't expand width */
+        }
+        .form-control:disabled {
+            background-color: #e9ecef;
+            opacity: 1;
+        }
+        .btn-submit {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn-submit:hover {
+            background-color: #0056b3;
+        }
+        .alert {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 0.25rem;
+        }
+        .alert-success {
+            color: #0f5132;
+            background-color: #d1e7dd;
+            border-color: #badbcc;
+        }
+        .alert-danger {
+            color: #842029;
+            background-color: #f8d7da;
+            border-color: #f5c2c7;
+        }
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            .profile-container {
+                margin: 1rem auto;
+                padding: 1.5rem;
+            }
+            .profile-header h1 {
+                font-size: 1.5rem;
+            }
+            .form-control, .btn-submit {
+                font-size: 0.9rem;
+                padding: 0.6rem 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+
+    <div class="profile-container">
+        <div class="profile-header">
+            <h1 th:text="${pageTitle ?: 'My Profile'}">My Profile</h1>
+        </div>
+
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+        <div th:if="${param.error == 'notauthenticated'}" class="alert alert-danger">
+            You need to be logged in to view your profile.
+        </div>
+
+
+        <form th:action="@{/profile/update}" th:object="${user}" method="post" sec:authorize="isAuthenticated()">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <input type="hidden" th:field="*{id}" />
+
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" th:field="*{username}" class="form-control" readonly="readonly" disabled="disabled"/>
+                <small class="form-text text-muted">Username cannot be changed.</small>
+            </div>
+
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" th:field="*{name}" class="form-control" required />
+                <div th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-danger small"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" th:field="*{email}" class="form-control" required />
+                 <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}" class="text-danger small"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="dateOfBirth">Date of Birth</label>
+                <input type="date" id="dateOfBirth" th:field="*{dateOfBirth}" class="form-control" />
+                <div th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}" class="text-danger small"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="gender">Gender</label>
+                <select id="gender" th:field="*{gender}" class="form-control">
+                    <option value="">Select Gender</option> <option value="MALE">Male</option>
+                    <option value="FEMALE">Female</option>
+                    <option value="OTHER">Other</option>
+                    <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
+                </select>
+                <div th:if="${#fields.hasErrors('gender')}" th:errors="*{gender}" class="text-danger small"></div>
+            </div>
+            
+            <div class="form-group">
+                <label>Roles</label>
+                <div>
+                    <span th:each="role, iterStat : *{roles}"
+                          th:text="${role.name + (!iterStat.last ? ', ' : '')}"
+                          class="badge bg-secondary me-1">ROLE</span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                <i class="fas fa-save"></i> Update Profile
+            </button>
+        </form>
+        
+        <div sec:authorize="!isAuthenticated()">
+            <p>Please <a th:href="@{/dashboard}">login</a> to view or edit your profile.</p>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/footer :: footer}"></div>
+    <script th:src="@{/js/messages.js}" defer></script>
+</body>
+</html>

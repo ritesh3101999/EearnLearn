@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Shopping Cart</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- Link to your external CSS file -->
+	<link rel="stylesheet" href="/css/style.css">
+	<!-- Font Awesome for icons -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<style>
+		/* General styles for the page */
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			min-height: 100vh;
+			color: #333;
+		}
+
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 20px;
+		}
+
+		/* Styling for the cart header section */
+		.cart-header {
+			text-align: center;
+			margin-bottom: 40px;
+			background: rgba(255, 255, 255, 0.1);
+			backdrop-filter: blur(10px);
+			border-radius: 20px;
+			padding: 30px;
+			border: 1px solid rgba(255, 255, 255, 0.2);
+		}
+
+		.cart-header h1 {
+			font-size: 2.5rem;
+			color: white;
+			margin-bottom: 10px;
+			text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+		}
+
+		.cart-header .cart-count {
+			background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
+			color: white;
+			padding: 8px 16px;
+			border-radius: 20px;
+			font-weight: bold;
+			display: inline-block;
+			margin-top: 10px;
+		}
+
+		/* Styling for the empty cart message */
+		.empty-cart {
+			text-align: center;
+			background: rgba(255, 255, 255, 0.95);
+			backdrop-filter: blur(10px);
+			border-radius: 20px;
+			padding: 60px 40px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+			border: 1px solid rgba(255, 255, 255, 0.3);
+		}
+
+		.empty-cart i {
+			font-size: 4rem;
+			color: #ccc;
+			margin-bottom: 20px;
+		}
+
+		.empty-cart p {
+			font-size: 1.2rem;
+			color: #666;
+			margin-bottom: 20px;
+		}
+
+		.empty-cart a {
+			background: linear-gradient(45deg, #667eea, #764ba2);
+			color: white;
+			padding: 12px 30px;
+			border-radius: 25px;
+			text-decoration: none;
+			font-weight: bold;
+			transition: all 0.3s ease;
+			display: inline-block;
+		}
+
+		.empty-cart a:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+		}
+
+		/* Layout for cart content (items and summary) */
+		.cart-content {
+			display: grid;
+			grid-template-columns: 1fr 350px;
+			gap: 30px;
+			align-items: start;
+		}
+
+		/* Styling for the list of cart items */
+		.cart-items {
+			background: rgba(255, 255, 255, 0.95);
+			backdrop-filter: blur(10px);
+			border-radius: 20px;
+			padding: 30px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+			border: 1px solid rgba(255, 255, 255, 0.3);
+		}
+
+		.cart-item {
+			display: grid;
+			grid-template-columns: 120px 1fr auto;
+			gap: 20px;
+			padding: 20px;
+			border-bottom: 1px solid #eee;
+			align-items: center;
+			transition: all 0.3s ease;
+			border-radius: 15px;
+			margin-bottom: 15px;
+		}
+
+		.cart-item:hover {
+			background: rgba(102, 126, 234, 0.05);
+			transform: translateY(-2px);
+			box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+		}
+
+		.cart-item:last-child {
+			border-bottom: none;
+			margin-bottom: 0;
+		}
+
+		.product-image {
+			width: 100px;
+			height: 100px;
+			border-radius: 15px;
+			object-fit: cover;
+			box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+			transition: transform 0.3s ease;
+		}
+
+		.product-image:hover {
+			transform: scale(1.05);
+		}
+
+		.item-details h3 {
+			font-size: 1.3rem;
+			color: #333;
+			margin-bottom: 8px;
+			font-weight: 600;
+		}
+
+		.item-details p {
+			color: #666;
+			margin-bottom: 5px;
+			font-size: 0.95rem;
+		}
+
+		.price {
+			font-weight: bold;
+			color: #667eea;
+			font-size: 1.1rem;
+		}
+
+		.quantity-controls {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			margin: 10px 0;
+		}
+
+		.quantity-btn {
+			background: linear-gradient(45deg, #667eea, #764ba2);
+			color: white;
+			border: none;
+			width: 35px;
+			height: 35px;
+			border-radius: 50%;
+			cursor: pointer;
+			font-size: 1rem;
+			transition: all 0.3s ease;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.quantity-btn:hover {
+			transform: scale(1.1);
+			box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+		}
+
+		.quantity-display {
+			background: #f8f9fa;
+			padding: 8px 15px;
+			border-radius: 20px;
+			font-weight: bold;
+			min-width: 40px;
+			text-align: center;
+		}
+
+		.item-actions {
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+			align-items: center;
+		}
+
+		.btn-remove {
+			background: linear-gradient(45deg, #FF6B6B, #FF8E8E);
+			color: white;
+			border: none;
+			padding: 8px 16px;
+			border-radius: 20px;
+			cursor: pointer;
+			font-size: 0.9rem;
+			transition: all 0.3s ease;
+			font-weight: 500;
+		}
+
+		.btn-remove:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+		}
+
+		/* Styling for the cart summary section */
+		.cart-summary {
+			background: rgba(255, 255, 255, 0.95);
+			backdrop-filter: blur(10px);
+			border-radius: 20px;
+			padding: 30px;
+			box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+			border: 1px solid rgba(255, 255, 255, 0.3);
+			position: sticky;
+			top: 20px;
+			height: fit-content;
+		}
+
+		.cart-summary h3 {
+			font-size: 1.5rem;
+			margin-bottom: 20px;
+			color: #333;
+			text-align: center;
+		}
+
+		.summary-row {
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 15px;
+			padding: 10px 0;
+			border-bottom: 1px solid #eee;
+		}
+
+		.summary-row:last-child {
+			border-bottom: 2px solid #667eea;
+			font-weight: bold;
+			font-size: 1.2rem;
+			color: #667eea;
+		}
+
+		.cart-actions {
+			display: flex;
+			flex-direction: column;
+			gap: 15px;
+			margin-top: 25px;
+		}
+
+		.btn-checkout {
+			background: linear-gradient(45deg, #4ECDC4, #44A08D);
+			color: white;
+			border: none;
+			padding: 15px 30px;
+			border-radius: 25px;
+			cursor: pointer;
+			font-size: 1.1rem;
+			font-weight: bold;
+			transition: all 0.3s ease;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+		}
+
+		.btn-checkout:hover {
+			transform: translateY(-3px);
+			box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
+		}
+
+		.btn-clear {
+			background: linear-gradient(45deg, #FF6B6B, #FF8E8E);
+			color: white;
+			border: none;
+			padding: 12px 25px;
+			border-radius: 25px;
+			cursor: pointer;
+			font-size: 1rem;
+			transition: all 0.3s ease;
+			font-weight: 500;
+		}
+
+		.btn-clear:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+		}
+
+		.continue-shopping {
+			text-align: center;
+			margin-top: 30px;
+		}
+
+		.continue-shopping a {
+			color: white;
+			text-decoration: none;
+			font-weight: bold;
+			background: rgba(255, 255, 255, 0.2);
+			padding: 12px 25px;
+			border-radius: 25px;
+			transition: all 0.3s ease;
+			display: inline-block;
+		}
+
+		.continue-shopping a:hover {
+			background: rgba(255, 255, 255, 0.3);
+			transform: translateY(-2px);
+		}
+
+		/* Loading Spinner Overlay styles */
+		.loading {
+			display: none;
+			/* Hidden by default */
+			position: fixed;
+			z-index: 1000;
+			/* Ensures it's on top of other content */
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.4);
+			/* Semi-transparent background */
+			align-items: center;
+			justify-content: center;
+			flex-direction: column;
+			color: white;
+			font-size: 1.2rem;
+			backdrop-filter: blur(5px);
+			/* Blurs content behind */
+		}
+
+		.loading.show {
+			display: flex;
+			/* Show when 'show' class is added */
+		}
+
+		.spinner {
+			border: 4px solid #f3f3f3;
+			/* Light grey border */
+			border-top: 4px solid #667eea;
+			/* Blue border for the spinning part */
+			border-radius: 50%;
+			width: 40px;
+			height: 40px;
+			animation: spin 1s linear infinite;
+			/* Spinner animation */
+			margin-bottom: 15px;
+		}
+
+		@keyframes spin {
+			0% {
+				transform: rotate(0deg);
+			}
+
+			100% {
+				transform: rotate(360deg);
+			}
+		}
+
+		/* Custom Confirmation Modal styles */
+		.modal {
+			display: none;
+			/* Hidden by default */
+			position: fixed;
+			z-index: 1001;
+			/* Above loading spinner */
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			overflow: auto;
+			background-color: rgba(0, 0, 0, 0.5);
+			/* Semi-transparent overlay */
+			backdrop-filter: blur(5px);
+			justify-content: center;
+			align-items: center;
+		}
+
+		.modal-content {
+			background-color: #fefefe;
+			margin: auto;
+			padding: 30px;
+			border-radius: 15px;
+			box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+			width: 90%;
+			max-width: 400px;
+			text-align: center;
+			position: relative;
+		}
+
+		.modal-content h3 {
+			margin-bottom: 20px;
+			color: #333;
+			font-size: 1.4rem;
+		}
+
+		.modal-buttons {
+			display: flex;
+			justify-content: space-around;
+			gap: 15px;
+			margin-top: 20px;
+		}
+
+		.modal-button {
+			padding: 10px 25px;
+			border: none;
+			border-radius: 25px;
+			cursor: pointer;
+			font-size: 1rem;
+			font-weight: bold;
+			transition: all 0.3s ease;
+		}
+
+		.modal-button.confirm {
+			background: linear-gradient(45deg, #FF6B6B, #FF8E8E);
+			/* Red gradient for confirm */
+			color: white;
+		}
+
+		.modal-button.cancel {
+			background: #ccc;
+			/* Grey for cancel */
+			color: #333;
+		}
+
+		.modal-button:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+		}
+
+		/* Responsive adjustments */
+		@media (max-width: 768px) {
+			.cart-content {
+				grid-template-columns: 1fr;
+				gap: 20px;
+			}
+
+			.cart-item {
+				grid-template-columns: 80px 1fr;
+				gap: 15px;
+			}
+
+			.item-actions {
+				grid-column: 1 / -1;
+				/* Span full width on small screens */
+				flex-direction: row;
+				justify-content: space-between;
+				margin-top: 15px;
+			}
+
+			.product-image {
+				width: 80px;
+				height: 80px;
+			}
+
+			.cart-header h1 {
+				font-size: 2rem;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<!-- Thymeleaf fragments for header and messages -->
+	<div th:replace="~{fragments/header :: header}"></div>
+	<div th:replace="~{fragments/messages :: messages}"></div>
+
+	<div class="container">
+		<div class="cart-header">
+			<h1><i class="fas fa-shopping-cart"></i> Your Shopping Cart</h1>
+			<!-- Display cart item count if cart is not empty -->
+			<div class="cart-count" th:unless="${cart.items.isEmpty()}">
+				<span th:text="${cart.items.size()}"></span> items in cart
+			</div>
+		</div>
+
+		<!-- Empty Cart Message: displayed when cart is empty -->
+		<div th:if="${cart.items.isEmpty()}" class="empty-cart">
+			<i class="fas fa-shopping-cart"></i>
+			<p>Your cart is empty</p>
+			<a th:href="@{/products}">
+				<i class="fas fa-store"></i> Start Shopping
+			</a>
+		</div>
+
+		<!-- Cart Items and Summary: displayed when cart is not empty -->
+		<div th:unless="${cart.items.isEmpty()}" class="cart-content">
+			<div class="cart-items">
+				<!-- Loop through each item in the cart -->
+				<div th:each="item : ${cart.items}" class="cart-item" th:data-item-id="${item.id}">
+					<img th:src="${item.product.imageUrl}" th:alt="${item.product.name}" class="product-image"
+						onerror="this.src='https://placehold.co/100x100/CCCCCC/FFFFFF?text=No+Image'">
+					<!-- Placeholder on error -->
+
+					<div class="item-details">
+						<h3 th:text="${item.product.name}"></h3>
+						<p class="price">₹<span th:text="${#numbers.formatDecimal(item.product.price, 0, 2)}"></span>
+						</p>
+
+						<div class="quantity-controls">
+							<!-- Quantity decrement button -->
+							<button type="button" class="quantity-btn" th:data-item-id="${item.id}" th:data-change="-1">
+								<i class="fas fa-minus"></i>
+							</button>
+							<span class="quantity-display" th:text="${item.quantity}"></span>
+							<!-- Quantity increment button -->
+							<button type="button" class="quantity-btn" th:data-item-id="${item.id}" th:data-change="1">
+								<i class="fas fa-plus"></i>
+							</button>
+						</div>
+
+						<p><strong>Subtotal: ₹<span class="item-subtotal"
+									th:text="${#numbers.formatDecimal(item.product.price * item.quantity, 0, 2)}"></span></strong>
+						</p>
+					</div>
+
+					<div class="item-actions">
+						<!-- Hidden form for updating quantity. This form will be submitted via JS. -->
+						<form th:id="'updateForm-' + ${item.id}" th:action="@{/cart/update/{itemId}(itemId=${item.id})}"
+							method="post" style="display: none;">
+							<input type="hidden" name="quantity" class="update-quantity-input" value="0">
+							<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+						</form>
+
+						<!-- Form for removing item. This form will be submitted via JS after confirmation. -->
+						<form th:id="'removeForm-' + ${item.id}" th:action="@{/cart/remove/{id}(id=${item.id})}"
+							method="post" class="remove-form">
+							<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+							<button type="submit" class="btn-remove">
+								<i class="fas fa-trash"></i> Remove
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+
+			<!-- Cart Summary Section -->
+			<div class="cart-summary">
+				<h3><i class="fas fa-receipt"></i> Order Summary</h3>
+
+				<div class="summary-row">
+					<span>Items (<span th:text="${cart.items.size()}"></span>):</span>
+					<span id="summary-items-total">₹<span
+							th:text="${#numbers.formatDecimal(#aggregates.sum(cart.items.![product.price * quantity]), 0, 2)}"></span></span>
+				</div>
+
+				<div class="summary-row">
+					<span>Shipping:</span>
+					<span>Free</span>
+				</div>
+
+				<div class="summary-row">
+					<span>Total:</span>
+					<span id="summary-grand-total">₹<span
+							th:text="${#numbers.formatDecimal(#aggregates.sum(cart.items.![product.price * quantity]), 0, 2)}"></span></span>
+				</div>
+
+				<div class="cart-actions">
+					<!-- Checkout form -->
+					<form th:action="@{/cart/checkout}" method="post">
+						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+						<button type="submit" class="btn-checkout">
+							<i class="fas fa-credit-card"></i> Proceed to Payment
+						</button>
+					</form>
+
+					<!-- Clear cart form. The button will trigger the modal. -->
+					<form th:action="@{/cart/clear}" method="post" id="clearCartForm">
+						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+						<button type="button" class="btn-clear" id="btnClearCart">
+							<i class="fas fa-trash-alt"></i> Clear Cart
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<div class="continue-shopping">
+			<a th:href="@{/products}">
+				<i class="fas fa-arrow-left"></i> Continue Shopping
+			</a>
+		</div>
+	</div>
+
+	<!-- Loading Spinner Overlay: displayed during form submissions -->
+	<div class="loading" id="loading">
+		<div class="spinner"></div>
+		<p>Updating cart...</p>
+	</div>
+
+	<!-- Custom Confirmation Modal: replaces native confirm() dialogs -->
+	<div id="confirmationModal" class="modal">
+		<div class="modal-content">
+			<h3 id="modalMessage"></h3>
+			<div class="modal-buttons">
+				<button class="modal-button confirm" id="modalConfirmBtn">Yes</button>
+				<button class="modal-button cancel" id="modalCancelBtn">No</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Thymeleaf fragment for footer -->
+	<div th:replace="~{fragments/footer :: footer}"></div>
+
+	<script>
+		// Global variable to store the callback function for the modal's confirmation
+		let currentModalCallback = null;
+
+		/**
+		 * Displays a custom confirmation modal with a given message and callback.
+		 * @param {string} message - The message text to display in the modal.
+		 * @param {function} onConfirm - The function to call when the user clicks 'Yes' or 'No'.
+		 * It receives a boolean parameter (true for 'Yes', false for 'No').
+		 */
+		function showModal(message, onConfirm) {
+			document.getElementById('modalMessage').textContent = message;
+			currentModalCallback = onConfirm; // Store the callback
+			document.getElementById('confirmationModal').style.display = 'flex'; // Show the modal
+		}
+
+		/**
+		 * Hides the custom confirmation modal.
+		 */
+		function hideModal() {
+			document.getElementById('confirmationModal').style.display = 'none'; // Hide the modal
+			currentModalCallback = null; // Clear the callback
+		}
+
+		// Event listener for the 'Yes' button in the custom modal
+		document.getElementById('modalConfirmBtn').addEventListener('click', () => {
+			if (currentModalCallback) {
+				currentModalCallback(true); // Execute callback with true for confirmation
+			}
+			hideModal(); // Always hide the modal after interaction
+		});
+
+		// Event listener for the 'No' button in the custom modal
+		document.getElementById('modalCancelBtn').addEventListener('click', () => {
+			if (currentModalCallback) {
+				currentModalCallback(false); // Execute callback with false for cancellation
+			}
+			hideModal(); // Always hide the modal after interaction
+		});
+
+		// Event listener to close the modal if clicked outside the content area
+		document.getElementById('confirmationModal').addEventListener('click', (event) => {
+			if (event.target === document.getElementById('confirmationModal')) {
+				hideModal();
+			}
+		});
+
+		/**
+		 * Handles the quantity update logic for a cart item.
+		 * This function now submits a form to trigger a full page refresh.
+		 * @param {HTMLElement} button - The clicked quantity button (either '+' or '-').
+		 * @param {number} change - The amount to change the quantity by (-1 for minus, 1 for plus).
+		 */
+		function updateQuantity(button, change) {
+			const cartItem = button.closest('.cart-item');
+			const quantityDisplay = cartItem.querySelector('.quantity-display');
+			const itemId = button.dataset.itemId;
+
+			let currentQuantity = parseInt(quantityDisplay.textContent);
+			let newQuantity = currentQuantity + change;
+
+			// If the new quantity would be less than 1, confirm removal
+			if (newQuantity < 1) {
+				showModal('Remove this item from cart?', (confirmed) => {
+					if (confirmed) {
+						// Show loading spinner before submitting removal form
+						document.getElementById('loading').classList.add('show');
+						const removeForm = document.getElementById('removeForm-' + itemId);
+						removeForm.submit(); // Submit the remove form
+					}
+				});
+				return; // Exit the function if confirmation for removal is pending
+			}
+
+			// Show loading spinner for quantity update
+			document.getElementById('loading').classList.add('show');
+
+			// Get the hidden update form and its quantity input for the specific item
+			const updateForm = document.getElementById('updateForm-' + itemId);
+			const quantityInput = updateForm.querySelector('.update-quantity-input');
+
+			// Update the hidden input's value with the new quantity
+			quantityInput.value = newQuantity;
+
+			// Submit the update form, which will cause a page reload
+			updateForm.submit();
+		}
+
+		// Attach click event listeners to all quantity buttons using event delegation
+		// This ensures the updateQuantity function is called with the correct parameters
+		document.querySelectorAll('.quantity-btn').forEach(button => {
+			button.addEventListener('click', function () {
+				const change = parseInt(this.dataset.change); // Get change value from data-attribute
+				updateQuantity(this, change);
+			});
+		});
+
+		// Attach click event listener to the "Clear Cart" button
+		document.getElementById('btnClearCart').addEventListener('click', function (e) {
+			e.preventDefault(); // Prevent the default form submission immediately
+			showModal('Are you sure you want to clear your cart?', (confirmed) => {
+				if (confirmed) {
+					// Show loading spinner before submitting clear cart form
+					document.getElementById('loading').classList.add('show');
+					document.getElementById('clearCartForm').submit(); // Submit the clear cart form
+				}
+			});
+		});
+
+	</script>
+</body>
+
+</html>

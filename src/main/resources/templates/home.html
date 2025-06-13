@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EarnLearn Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!--<link rel="stylesheet" th:href="@{/css/style.css}">-->
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #f59e0b;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --radius-sm: 0.5rem;
+            --radius-md: 1rem;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background-color: #f5f7fb;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 2rem 1rem;
+            box-shadow: var(--shadow-md);
+            position: fixed;
+            height: 100vh;
+            width: 280px;
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 2rem;
+            padding: 0 1rem;
+        }
+
+        .sidebar-brand i {
+            font-size: 2rem;
+            background: rgba(255,255,255,0.2);
+            padding: 12px;
+            border-radius: 50%;
+        }
+
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem 1.5rem;
+            border-radius: var(--radius-sm);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 500;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Main Content */
+        .main-content {
+            grid-column: 2;
+            padding: 2rem;
+            background-color: #f5f7fb;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border-radius: var(--radius-md);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-banner::before {
+            content: "";
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 4px solid var(--primary);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card.bookmarks { border-left-color: var(--secondary); }
+        .stat-card.courses { border-left-color: var(--success); }
+        .stat-card.products { border-left-color: #8b5cf6; }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .stat-icon {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .stat-card.bookmarks .stat-icon { color: var(--secondary); }
+        .stat-card.courses .stat-icon { color: var(--success); }
+        .stat-card.products .stat-icon { color: #8b5cf6; }
+
+        .section-title {
+            margin: 2rem 0 1.5rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e2e8f0;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-img-top {
+            height: 160px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #93c5fd 0%, #dbeafe 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-dark);
+            font-size: 3.5rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .card-text {
+            color: #64748b;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .card-footer {
+            background: transparent;
+            border-top: none;
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .btn-card {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.7rem;
+            border-radius: var(--radius-sm);
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .btn-card:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Live Sessions */
+        .live-session-card {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            padding: 1.5rem;
+            background: white;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--secondary);
+            transition: all 0.3s ease;
+        }
+
+        .live-session-card:hover {
+            transform: translateX(5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .session-badge {
+            background: var(--danger);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .session-time {
+            font-size: 0.9rem;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        /* Recent Activities - NEW STYLES */
+        .activity-card {
+            background: white;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1rem;
+            padding: 1.2rem 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            transition: all 0.2s ease;
+            text-decoration: none; /* Ensure it looks like a card, not just a link */
+            color: inherit; /* Inherit text color */
+        }
+
+        .activity-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .activity-icon {
+            font-size: 1.8rem;
+            color: var(--primary); /* Default icon color */
+            min-width: 40px; /* Fixed width for consistent alignment */
+            text-align: center;
+        }
+
+        /* Specific icon colors based on activity type (optional, can be extended) */
+        .activity-card[data-type="New Note"] .activity-icon { color: var(--success); }
+        .activity-card[data-type="Course Enrollment"] .activity-icon { color: var(--secondary); }
+        .activity-card[data-type="Purchase"] .activity-icon { color: #8b5cf6; } /* Purple */
+
+        .activity-content {
+            flex-grow: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+            color: var(--dark);
+        }
+
+        .activity-description {
+            font-size: 0.95rem;
+            color: #475569;
+            margin-bottom: 0.5rem;
+        }
+
+        .activity-timestamp {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                padding: 1rem;
+            }
+
+            .sidebar-nav {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .main-content {
+                grid-column: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid,
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-banner h1 {
+                font-size: 1.5rem;
+            }
+            .welcome-banner p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i class="fas fa-graduation-cap"></i>
+                <h2>EarnLearn</h2>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a th:href="@{/notes}" class="nav-item">
+                    <i class="fas fa-sticky-note"></i>
+                    <span>My Notes</span>
+                </a>
+                <a th:href="@{/courses}" class="nav-item">
+                    <i class="fas fa-book-open"></i>
+                    <span>Courses</span>
+                </a>
+                <a th:href="@{/marketplace}" class="nav-item">
+                    <i class="fas fa-store"></i>
+                    <span>Marketplace</span>
+                </a>
+                <a th:href="@{/live-sessions}" class="nav-item">
+                    <i class="fas fa-video"></i>
+                    <span>Live Sessions</span>
+                </a>
+                <a th:href="@{/certificates/my-certificates}" class="nav-item">
+                    <i class="fas fa-award"></i>
+                    <span>Certificates</span>
+                </a>
+                <a th:href="@{/cart}" class="nav-item">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>My Cart</span>
+                </a>
+                <a th:href="@{/orders}" class="nav-item">
+                    <i class="fas fa-receipt"></i>
+                    <span>My Orders</span>
+                </a>
+                <a th:href="@{/profile}" class="nav-item">
+                    <i class="fas fa-user"></i>
+                    <span>Profile</span>
+                </a>
+                <a th:href="@{/users/logout}" class="nav-item">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+                <h1>Welcome back, <span th:text="${currentUser.name}">User</span>!</h1>
+                <p class="lead">Continue your learning journey or explore new resources</p>
+                <div class="mt-3">
+                    <a th:href="@{/courses}" class="btn btn-light me-2">
+                        <i class="fas fa-book me-2"></i> Browse Courses
+                    </a>
+                    <a th:href="@{/notes}" class="btn btn-outline-light">
+                        <i class="fas fa-plus me-2"></i> Create Note
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-sticky-note"></i>
+                    </div>
+                    <div class="stat-value" th:text="${notesCount}">0</div>
+                    <div class="stat-label">Total Notes</div>
+                </div>
+
+                <div class="stat-card bookmarks">
+                    <div class="stat-icon">
+                        <i class="fas fa-bookmark"></i>
+                    </div>
+                    <div class="stat-value" th:text="${bookmarksCount}">0</div>
+                    <div class="stat-label">Bookmarked Notes</div>
+                </div>
+
+                <div class="stat-card courses">
+                    <div class="stat-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="stat-value" th:text="${enrollmentsCount}">0</div>
+                    <div class="stat-label">Enrolled Courses</div>
+                </div>
+
+                <div class="stat-card products">
+                    <div class="stat-icon">
+                        <i class="fas fa-shopping-bag"></i>
+                    </div>
+                    <div class="stat-value" th:text="${cartCount}">0</div>
+                    <div class="stat-label">Items in Cart</div>
+                </div>
+            </div>
+
+            <!-- Quick Access Section -->
+            <h3 class="section-title">
+                <i class="fas fa-rocket text-primary"></i>
+                Quick Access
+            </h3>
+
+            <div class="card-grid">
+                <div class="feature-card">
+                    <div class="card-img-top">
+                        <i class="fas fa-sticky-note"></i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Notes Management</h5>
+                        <p class="card-text">Create, organize, and access your notes with powerful search and folder organization.</p>
+                        <div class="card-footer">
+                            <a th:href="@{/notes}" class="btn btn-card">
+                                <i class="fas fa-arrow-right me-2"></i>Go to Notes
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="card-img-top">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Learning Courses</h5>
+                        <p class="card-text">Browse courses, enroll in new programs, and track your learning progress.</p>
+                        <div class="card-footer">
+                            <a th:href="@{/courses}" class="btn btn-card">
+                                <i class="fas fa-arrow-right me-2"></i>Explore Courses
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="card-img-top">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Marketplace</h5>
+                        <p class="card-text">Discover educational resources, tools, and materials from our community.</p>
+                        <div class="card-footer">
+                            <a th:href="@{/marketplace}" class="btn btn-card">
+                                <i class="fas fa-arrow-right me-2"></i>Visit Marketplace
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upcoming Live Sessions -->
+            <div th:if="${not #lists.isEmpty(upcomingSessions)}">
+                <h3 class="section-title">
+                    <i class="fas fa-video text-danger"></i>
+                    Upcoming Live Sessions
+                </h3>
+
+                <div class="live-sessions">
+                    <div class="live-session-card" th:each="session : ${upcomingSessions}">
+                        <div class="session-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div>
+                            <div class="d-flex align-items-center mb-1">
+                                <h5 class="mb-0 me-2" th:text="${session.title}">Session Title</h5>
+                                <span class="session-badge">LIVE</span>
+                            </div>
+                            <p class="mb-2" th:text="${session.description}">Session description...</p>
+                            <div class="session-time">
+                                <i class="far fa-calendar"></i>
+                                <span th:text="${#temporals.format(session.startTime, 'MMM dd, yyyy hh:mm a')}">
+                                    Date & Time
+                                </span>
+                            </div>
+                        </div>
+                        <a th:href="@{'/live-sessions/' + ${session.id}}"
+                           class="btn btn-outline-primary ms-auto">
+                            Join Session
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <h3 class="section-title">
+                <i class="fas fa-history text-secondary"></i>
+                Recent Activities
+            </h3>
+            <div class="recent-activities-list">
+                <div th:if="${#lists.isEmpty(recentActivities)}" class="alert alert-info">
+                    No recent activities found. Start exploring EarnLearn!
+                </div>
+                <a th:each="activity : ${recentActivities}"
+                   th:href="${activity.link ?: '#'}"
+                   th:data-type="${activity.type}"
+                   class="activity-card">
+                    <div class="activity-icon">
+                        <!-- Dynamic icon based on activity type (extend as needed) -->
+                        <i th:class="${activity.type == 'New Note' ? 'fas fa-sticky-note' :
+                                      (activity.type == 'Course Enrollment' ? 'fas fa-book-open' :
+                                      (activity.type == 'Purchase' ? 'fas fa-shopping-bag' : 'fas fa-info-circle'))}"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h6 class="activity-title" th:text="${activity.type}">Activity Type</h6>
+                        <p class="activity-description" th:text="${activity.description}">Activity description...</p>
+                        <small class="activity-timestamp">
+                            <i class="far fa-clock me-1"></i>
+                            <span th:text="${#temporals.format(activity.timestamp, 'MMM dd, yyyy HH:mm')}">Timestamp</span>
+                        </small>
+                    </div>
+                </a>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Simple greeting based on time of day
+        document.addEventListener('DOMContentLoaded', function() {
+            const hour = new Date().getHours();
+            const welcomeBanner = document.querySelector('.welcome-banner h1');
+            if (welcomeBanner) {
+                const greeting = hour < 12 ? 'Good morning' :
+                                 hour < 18 ? 'Good afternoon' : 'Good evening';
+
+                const userSpan = welcomeBanner.querySelector('span');
+                if (userSpan) {
+                    // Corrected line: Removed the th:text attribute which is for server-side rendering.
+                    welcomeBanner.innerHTML =
+                        `${greeting}, <span>${userSpan.textContent}</span>!`;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

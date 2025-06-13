@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Product Lectures</title>
+	<link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<div class="container">
+		<h1 th:text="${product.name + ' Tutorials'}"></h1>
+
+		<div class="lecture-controls">
+			<a th:href="@{/products/{productId}/lectures/new(productId=${product.id})}" class="btn btn-primary">
+				<i class="fas fa-plus"></i> Add Lecture
+			</a>
+		</div>
+
+		<div class="lecture-list">
+			<div th:each="lecture : ${lectures}" class="lecture-card">
+				<div class="lecture-header">
+					<h3>
+						<span th:text="'Lesson ' + ${lecture.lessonOrder}"></span>
+						<span th:text="${lecture.title}"></span>
+					</h3>
+					<div class="lecture-actions">
+						<a th:href="@{/products/{productId}/lectures/edit/{lectureId}(productId=${product.id}, lectureId=${lecture.id})}"
+							class="btn btn-sm btn-edit">
+							<i class="fas fa-edit"></i>
+						</a>
+						<a th:href="@{/products/{productId}/lectures/delete/{lectureId}(productId=${product.id}, lectureId=${lecture.id})}"
+							class="btn btn-sm btn-delete">
+							<i class="fas fa-trash"></i>
+						</a>
+					</div>
+				</div>
+
+				<div th:if="${lecture.videoUrl}" class="video-container">
+					<iframe
+						th:src="'https://www.youtube.com/embed/' + ${#strings.substringAfter(lecture.videoUrl, 'https://youtu.be/')}"
+						allowfullscreen>
+					</iframe>
+				</div>
+
+				<div class="lecture-content" th:text="${lecture.content}"></div>
+			</div>
+		</div>
+	</div>
+</body>
+
+</html>

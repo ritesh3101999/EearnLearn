@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title th:text="${pageTitle ?: 'Manage Orders'}">Manage Orders</title>
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+		rel="stylesheet">
+	<style>
+		/* General Body & Container Styling */
+		body {
+			font-family: 'Inter', sans-serif;
+			margin: 0;
+			background-color: #f0f2f5;
+			/* Light grey background */
+			color: #333;
+			line-height: 1.6;
+			display: flex;
+			flex-direction: column;
+			min-height: 100vh;
+		}
+
+		.admin-container {
+			max-width: 1200px;
+			margin: 2rem auto;
+			padding: 2.5rem;
+			background-color: #ffffff;
+			border-radius: 12px;
+			/* More rounded corners */
+			box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+			/* Softer, larger shadow */
+			flex-grow: 1;
+			/* Allows container to grow and push footer down */
+			border: 1px solid #e0e0e0;
+		}
+
+		h1 {
+			font-size: 2.5rem;
+			/* Larger heading */
+			color: #2d3748;
+			/* Darker grey for headings */
+			margin-bottom: 2rem;
+			text-align: center;
+			font-weight: 700;
+		}
+
+		/* Alert Messages */
+		.alert {
+			padding: 1rem 1.5rem;
+			margin-bottom: 1.5rem;
+			border-radius: 8px;
+			/* Consistent rounded corners */
+			font-weight: 500;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			font-size: 0.95rem;
+			border: 1px solid transparent;
+			/* Default transparent border */
+		}
+
+		.alert-success {
+			background-color: #e6ffed;
+			/* Light green */
+			color: #1a7d35;
+			/* Dark green text */
+			border-color: #c8e6c9;
+			/* Green border */
+		}
+
+		.alert-danger {
+			background-color: #ffe6e6;
+			/* Light red */
+			color: #d32f2f;
+			/* Dark red text */
+			border-color: #ffcdd2;
+			/* Red border */
+		}
+
+		/* Table Styles */
+		.table-responsive {
+			overflow-x: auto;
+			/* Allows horizontal scrolling for small screens */
+			margin-top: 2rem;
+		}
+
+		.table {
+			width: 100%;
+			border-collapse: collapse;
+			margin-bottom: 1rem;
+			background-color: #fff;
+			border-radius: 10px;
+			/* Rounded table corners */
+			overflow: hidden;
+			/* Ensures rounded corners are visible */
+			box-shadow: 0 2px 15px rgba(0, 0, 0, 0.07);
+			/* Subtle table shadow */
+		}
+
+		.table th,
+		.table td {
+			padding: 15px 20px;
+			border-bottom: 1px solid #f0f0f0;
+			/* Lighter border */
+			text-align: left;
+			vertical-align: middle;
+			font-size: 0.9rem;
+			/* Slightly smaller font for table content */
+		}
+
+		.table th {
+			background-color: #e9ecef;
+			/* Light grey header */
+			color: #555;
+			/* Darker grey for header text */
+			font-weight: 600;
+			/* Semi-bold */
+			text-transform: uppercase;
+			font-size: 0.8rem;
+			/* Smaller, more refined header text */
+			letter-spacing: 0.5px;
+		}
+
+		.table tbody tr:last-child td {
+			border-bottom: none;
+		}
+
+		.table tbody tr:hover {
+			background-color: #f6f6f6;
+			/* Slightly darker on hover */
+			transition: background-color 0.2s ease-in-out;
+		}
+
+		/* Status Badges */
+		.status-badge {
+			display: inline-block;
+			padding: 0.5em 0.8em;
+			/* Increased padding */
+			font-size: 0.75em;
+			font-weight: 700;
+			line-height: 1;
+			color: #fff;
+			text-align: center;
+			white-space: nowrap;
+			vertical-align: middle;
+			/* Align middle with text */
+			border-radius: 20px;
+			/* Pill shape */
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+			/* Subtle shadow on badges */
+			transition: all 0.2s ease-in-out;
+		}
+
+		.status-badge:hover {
+			transform: translateY(-1px);
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+		}
+
+		.status-PENDING {
+			background-color: #ffc107;
+			color: #333;
+		}
+
+		/* Warning yellow */
+		.status-PROCESSING {
+			background-color: #0d6efd;
+		}
+
+		/* Primary blue */
+		.status-SHIPPED {
+			background-color: #198754;
+		}
+
+		/* Success green */
+		.status-DELIVERED {
+			background-color: #6c757d;
+		}
+
+		/* Secondary grey */
+		.status-CANCELLED {
+			background-color: #dc3545;
+		}
+
+		/* Danger red */
+
+		/* Button Styling */
+		.btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 10px 20px;
+			/* Increased padding */
+			border-radius: 8px;
+			/* More rounded buttons */
+			font-size: 0.9rem;
+			/* Consistent font size */
+			font-weight: 600;
+			cursor: pointer;
+			text-decoration: none;
+			transition: all 0.3s ease;
+			/* Smooth transitions */
+			border: none;
+			/* Remove default border */
+			gap: 8px;
+			/* Space between icon and text */
+			box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+			/* Subtle button shadow */
+		}
+
+		.btn-info {
+			background-color: #17a2b8;
+			/* Info teal */
+			color: white;
+		}
+
+		.btn-info:hover {
+			background-color: #138496;
+			transform: translateY(-2px);
+			/* Lift effect */
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+		}
+
+		.btn-secondary {
+			background-color: #6c757d;
+			color: white;
+		}
+
+		.btn-secondary:hover {
+			background-color: #5a6268;
+			transform: translateY(-2px);
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+		}
+
+		/* Utility Classes */
+		.text-center {
+			text-align: center;
+		}
+
+		.mt-3 {
+			margin-top: 1.5rem;
+		}
+
+		/* Responsive Design */
+		@media (max-width: 768px) {
+			.admin-container {
+				margin: 1rem;
+				padding: 1.5rem;
+			}
+
+			h1 {
+				font-size: 2rem;
+			}
+
+			.table th,
+			.table td {
+				padding: 12px 15px;
+				font-size: 0.85rem;
+			}
+
+			.btn {
+				padding: 8px 15px;
+				font-size: 0.85rem;
+			}
+		}
+
+		@media (max-width: 480px) {
+
+			.table th,
+			.table td {
+				padding: 10px;
+				font-size: 0.8rem;
+			}
+
+			.status-badge {
+				padding: 0.4em 0.6em;
+			}
+
+			.btn {
+				width: 100%;
+				/* Full width buttons on very small screens */
+				margin-top: 0.5rem;
+			}
+		}
+
+		/* Basic header and footer placeholders for context, assuming they are in fragments */
+		.main-header,
+		.main-footer {
+			background-color: #343a40;
+			color: #fff;
+			padding: 1rem 0;
+			text-align: center;
+		}
+
+		.main-header a,
+		.main-footer a {
+			color: #fff;
+			text-decoration: none;
+		}
+	</style>
+</head>
+
+<body>
+	<!-- Assuming fragments/header.html is included via Thymeleaf -->
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<div class="admin-container">
+		<h1 th:text="${pageTitle}">Manage Orders</h1>
+
+		<!-- Success and Error Messages -->
+		<div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+		<div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+		<div class="table-responsive">
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Order ID</th>
+						<th>Customer</th>
+						<th>Order Date</th>
+						<th>Status</th>
+						<th>Total</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="order : ${orders}">
+						<td th:text="${order.id}">1</td>
+						<td th:text="${order.user.username}">user</td>
+						<td th:text="${#temporals.format(order.orderDate, 'dd-MMM-yyyy HH:mm')}">Date</td>
+						<td>
+							<span class="status-badge" th:classappend="'status-' + ${order.status}"
+								th:text="${order.status}">STATUS</span>
+						</td>
+						<td
+							th:text="'₹' + ${#numbers.formatDecimal(#aggregates.sum(order.items.![priceAtPurchase * quantity]), 0, 'COMMA', 2, 'POINT')}">
+							₹0.00
+						</td>
+						<td>
+							<a th:href="@{/admin/orders/view/{id}(id=${order.id})}" class="btn btn-info btn-sm">
+								<i class="fas fa-eye"></i> View
+							</a>
+						</td>
+					</tr>
+					<tr th:if="${#lists.isEmpty(orders)}">
+						<td colspan="6" class="text-center">No orders found.</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<a th:href="@{/admin/dashboard}" class="btn btn-secondary mt-3">
+			<i class="fas fa-arrow-left"></i> Back to Admin Dashboard
+		</a>
+	</div>
+
+	<!-- Assuming fragments/footer.html is included via Thymeleaf -->
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+
+</html>

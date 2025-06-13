@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle ?: 'My Certificates'}">My Certificates</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .certificates-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .certificate-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .certificate-card h3 {
+            margin: 0;
+            color: #007bff;
+        }
+        .certificate-card .actions .btn {
+            padding: 0.5rem 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragments/header :: header}"></div>
+    <div class="certificates-container">
+        <h1><i class="fas fa-certificate"></i> <span th:text="${pageTitle}">My Certificates</span></h1>
+
+        <div th:if="${certificates.isEmpty()}" class="alert alert-info mt-4">
+            You have not earned any certificates yet. Complete a course to get started!
+        </div>
+
+        <div th:each="cert : ${certificates}" class="certificate-card mt-3">
+            <div>
+                <h3><i class="fas fa-award"></i> <span th:text="${cert.course.title}">Course Title</span></h3>
+                <p class="mb-0 text-muted">Issued on: <span th:text="${#temporals.format(cert.issueDate, 'dd MMMM yyyy')}"></span></p>
+            </div>
+            <div class="actions">
+                <a th:href="@{/certificates/view/{uid}(uid=${cert.certificateUid})}" class="btn btn-primary" target="_blank">
+                    <i class="fas fa-eye"></i> View Certificate
+                </a>
+            </div>
+        </div>
+
+        <a th:href="@{/enrollments/my-courses}" class="btn btn-secondary mt-4">
+            <i class="fas fa-arrow-left"></i> Back to My Courses
+        </a>
+    </div>
+    <div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

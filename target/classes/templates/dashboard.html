@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>Dashboard - EarnLearn</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+		integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+		crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+	<style>
+		/* Reset & Basic Styles */
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: 'Poppins', sans-serif;
+			line-height: 1.6;
+			background: #f8f9fa;
+			color: #333;
+			padding-top: 70px;
+		}
+
+		a {
+			text-decoration: none;
+			color: inherit;
+		}
+
+		/* Navbar */
+		.navbar {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			background-color: #fff;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+			padding: 1rem 0;
+			z-index: 1000;
+		}
+
+		.navbar .container {
+			max-width: 1200px;
+			margin: auto;
+			padding: 0 1rem;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.navbar-brand {
+			font-size: 1.5rem;
+			font-weight: bold;
+			color: #00b894;
+		}
+
+		.nav-links {
+			list-style: none;
+			display: flex;
+			gap: 1rem;
+		}
+
+		.nav-links li a {
+			color: #333;
+			transition: color 0.3s ease;
+		}
+
+		.nav-links li a:hover {
+			color: #0984e3;
+		}
+
+		/* Hero Section */
+		.hero {
+			position: relative;
+			height: 50vh;
+			overflow: hidden;
+		}
+
+		.hero .slide {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-size: cover;
+			background-position: center;
+			opacity: 0;
+			animation: slideShow 15s infinite;
+		}
+
+		.hero .slide:nth-child(1) {
+			animation-delay: 0s;
+		}
+
+		.hero .slide:nth-child(2) {
+			animation-delay: 5s;
+		}
+
+		.hero .slide:nth-child(3) {
+			animation-delay: 10s;
+		}
+
+		@keyframes slideShow {
+			0% {
+				opacity: 0;
+			}
+
+			6.66% {
+				opacity: 1;
+			}
+
+			33.33% {
+				opacity: 1;
+			}
+
+			40% {
+				opacity: 0;
+			}
+
+			100% {
+				opacity: 0;
+			}
+		}
+
+		.hero-content {
+			position: relative;
+			z-index: 1;
+			color: #fff;
+			text-align: center;
+			padding: 2rem;
+		}
+
+		.hero-content h1 {
+			font-size: 3rem;
+			margin-bottom: 1rem;
+			transform: translateY(-20px);
+			opacity: 0;
+			animation: slideIn 0.5s ease-out forwards;
+		}
+
+		.hero-content p {
+			font-size: 1.2rem;
+			margin-bottom: 1.5rem;
+			transform: translateY(-20px);
+			opacity: 0;
+			animation: slideIn 0.5s ease-out forwards 0.2s;
+		}
+
+		.hero-content .btn {
+			display: inline-block;
+			padding: 0.75rem 1.5rem;
+			background: #00b894;
+			color: #fff;
+			border-radius: 4px;
+			font-size: 1.2rem;
+			transition: background 0.3s ease;
+			transform: translateY(-20px);
+			opacity: 0;
+			animation: slideIn 0.5s ease-out forwards 0.4s;
+		}
+
+		.hero-content .btn:hover {
+			background: #009e7f;
+		}
+
+		@keyframes slideIn {
+			to {
+				transform: translateY(0);
+				opacity: 1;
+			}
+		}
+
+		/* Dashboard Cards */
+		.cards {
+			max-width: 1200px;
+			margin: 2rem auto;
+			padding: 0 1rem;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 1rem;
+		}
+
+		.card {
+			background: #fff;
+			flex: 1 1 300px;
+			padding: 1.5rem;
+			border-radius: 8px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+			transition: transform 0.3s ease, box-shadow 0.3s ease;
+			text-align: center;
+			border: 1px solid #e0e0e0;
+			animation: fadeInUp 0.5s ease-out;
+		}
+
+		.card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+		}
+
+		.card-image {
+			width: 100%;
+			height: 150px;
+			object-fit: cover;
+			border-radius: 8px 8px 0 0;
+		}
+
+		.card i {
+			font-size: 2.5rem;
+			margin: 1rem 0;
+			color: #0984e3;
+		}
+
+		.card h3 {
+			margin-bottom: 1rem;
+			color: #00b894;
+		}
+
+		.card p {
+			margin-bottom: 1.5rem;
+		}
+
+		.card a.btn {
+			display: inline-block;
+			padding: 0.5rem 1rem;
+			background: #00b894;
+			color: #fff;
+			border-radius: 4px;
+			transition: background 0.3s ease;
+		}
+
+		.card a.btn:hover {
+			background: #009e7f;
+		}
+
+		/* Testimonials */
+		.testimonials {
+			max-width: 1200px;
+			margin: 2rem auto;
+			padding: 0 1rem;
+			text-align: center;
+		}
+
+		.testimonials h2 {
+			font-size: 2rem;
+			margin-bottom: 1.5rem;
+			color: #00b894;
+		}
+
+		.testimonial-cards {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 1rem;
+		}
+
+		.testimonial-card {
+			background: #fff;
+			flex: 1 1 300px;
+			padding: 1.5rem;
+			border-radius: 8px;
+			box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+			text-align: left;
+		}
+
+		.testimonial-card p {
+			font-style: italic;
+			margin-bottom: 1rem;
+		}
+
+		.testimonial-card span {
+			font-weight: bold;
+			color: #0984e3;
+		}
+
+		/* Modals */
+		.modal {
+			display: none;
+			position: fixed;
+			z-index: 10;
+			left: 0;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.7);
+			align-items: center;
+			justify-content: center;
+			padding: 1rem;
+		}
+
+		.modal:target {
+			display: flex;
+		}
+
+		.modal-content {
+			background: #fff;
+			padding: 2rem;
+			border-radius: 8px;
+			max-width: 450px;
+			width: 90%;
+			position: relative;
+			max-height: 80vh;
+			overflow-y: auto;
+			transform: scale(0.9);
+			opacity: 0;
+			transition: transform 0.3s ease, opacity 0.3s ease;
+		}
+
+		.modal:target .modal-content {
+			transform: scale(1);
+			opacity: 1;
+		}
+
+		.modal-content h2 {
+			margin-bottom: 1rem;
+			color: #0984e3;
+			text-align: center;
+		}
+
+		.modal .close {
+			position: absolute;
+			top: 10px;
+			right: 20px;
+			font-size: 2.5rem;
+			color: #333;
+			cursor: pointer;
+			transition: color 0.3s ease;
+		}
+
+		.modal .close:hover {
+			color: #0984e3;
+		}
+
+		/* Form Styles */
+		.form-group {
+			margin-top: 1rem;
+		}
+
+		.form-group label {
+			display: block;
+			margin-bottom: 0.3rem;
+			font-weight: bold;
+		}
+
+		.form-group i {
+			margin-right: 0.5rem;
+			color: #0984e3;
+		}
+
+		.form-group input,
+		.form-group select {
+			width: 100%;
+			padding: 0.5rem;
+			margin-top: 0.3rem;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+		}
+
+		.form-group input:focus,
+		.form-group select:focus {
+			outline: none;
+			border-color: #0984e3;
+			box-shadow: 0 0 5px rgba(9, 132, 227, 0.5);
+		}
+
+		.gender-options {
+			margin-top: 1rem;
+		}
+
+		.gender-options label {
+			margin-right: 0.5rem;
+			font-weight: normal;
+		}
+
+		.gender-options i {
+			margin-right: 0.3rem;
+		}
+
+		.modal-content button {
+			margin-top: 1.5rem;
+			width: 100%;
+			padding: 0.7rem;
+			background: #00b894;
+			color: #fff;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 1rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 0.5rem;
+			transition: background 0.3s ease;
+		}
+
+		.modal-content button:hover {
+			background: #009e7f;
+		}
+
+		/* Alerts */
+		.alert-container {
+			position: fixed;
+			top: 70px;
+			left: 50%;
+			transform: translateX(-50%);
+			width: 90%;
+			max-width: 600px;
+			z-index: 1050;
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+		}
+
+		.alert {
+			padding: 1rem;
+			border-radius: 4px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			transition: opacity 0.5s ease-in-out;
+			opacity: 1;
+		}
+
+		.alert-success {
+			background-color: #d4edda;
+			color: #155724;
+			border: 1px solid #c3e6cb;
+		}
+
+		.alert-danger {
+			background-color: #f8d7da;
+			color: #721c24;
+			border: 1px solid #f5c6cb;
+		}
+
+		.close-btn {
+			background: none;
+			border: none;
+			font-size: 1.5rem;
+			cursor: pointer;
+			color: inherit;
+			padding: 0 0.5rem;
+		}
+
+		/* Animations */
+		@keyframes fadeIn {
+			from {
+				opacity: 0;
+			}
+
+			to {
+				opacity: 1;
+			}
+		}
+
+		@keyframes fadeInUp {
+			from {
+				opacity: 0;
+				transform: translateY(20px);
+			}
+
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		/* Responsive */
+		@media (max-width: 768px) {
+			.hero {
+				height: 40vh;
+			}
+
+			.hero h1 {
+				font-size: 2rem;
+			}
+
+			.hero p {
+				font-size: 1rem;
+			}
+
+			.cards,
+			.testimonial-cards {
+				flex-direction: column;
+			}
+
+			.modal-content {
+				width: 95%;
+				padding: 1.5rem;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<nav class="navbar">
+		<div class="container">
+			<div class="navbar-brand">EarnLearn</div>
+			<ul class="nav-links">
+				<li><a href="#loginModal">Login</a></li>
+				<li><a href="#registerModal">Register</a></li>
+			</ul>
+		</div>
+	</nav>
+
+	<div class="alert-container">
+		<div th:if="${param.logout}" class="alert alert-success">
+			<span>You have been logged out successfully.</span>
+			<button type="button" class="close-btn" aria-label="Close">×</button>
+		</div>
+		<div th:if="${param.error}" class="alert alert-danger">
+			<span>Invalid username or password. Please try again.</span>
+			<button type="button" class="close-btn" aria-label="Close">×</button>
+		</div>
+		<div th:if="${successMessage}" class="alert alert-success">
+			<span th:text="${successMessage}"></span>
+			<button type="button" class="close-btn" aria-label="Close">×</button>
+		</div>
+		<div th:if="${errorMessage}" class="alert alert-danger">
+			<span th:text="${errorMessage}"></span>
+			<button type="button" class="close-btn" aria-label="Close">×</button>
+		</div>
+	</div>
+
+	<section class="hero">
+		<div class="slide"
+			style="background-image: url('https://miro.medium.com/v2/resize:fit:1358/1*RgpkY5oh9hD7fhQ-bInSpg.png?handmade');">
+		</div>
+		<div class="slide"
+			style="background-image: url('https://www.noel.alsace/wp-content/uploads/2019/07/thio-artisanat-decoupe-decor-papier-noel-1600x900.jpg?craft');">
+		</div>
+		<div class="slide"
+			style="background-image: url('https://er.educause.edu/-/media/images/articles/2023/08/er23_0101_headerart_1600x900.jpg?learning');">
+		</div>
+		<div class="hero-content">
+			<h1>Welcome to EarnLearn</h1>
+			<p>Discover courses, shop handmade products, and boost your productivity with smart notes.</p>
+			<a href="#registerModal" class="btn">Get Started</a>
+		</div>
+	</section>
+
+	<section class="cards">
+		<div class="card">
+			<img src="https://foundr.com/wp-content/uploads/2021/09/Best-online-course-platforms.png?education"
+				alt="Courses in EarnLearn" class="card-image">
+			<i class="fas fa-book fa-2x" aria-hidden="true"></i>
+			<h3>Courses</h3>
+			<p>Access a variety of courses taught by industry experts.</p>
+			<a href="/courses" class="btn">Explore Courses</a>
+		</div>
+		<div class="card">
+			<img src="https://www.algolia.com/files/live/sites/algolia-assets/files/blogs/bannerimages/building-an-online.webp?market,handmade"
+				alt="Marketplace in EarnLearn" class="card-image">
+			<i class="fas fa-store fa-2x" aria-hidden="true"></i>
+			<h3>Marketplace</h3>
+			<p>Browse unique handcrafted items made with passion.</p>
+			<a href="/marketplace" class="btn">Visit Marketplace</a>
+		</div>
+		<div class="card">
+			<img src="https://m.media-amazon.com/images/I/71jOPtDj7HL._AC_UF894,1000_QL80_.jpg?notes,technology"
+				alt="Smart Notes in EarnLearn" class="card-image">
+			<i class="fas fa-sticky-note fa-2x" aria-hidden="true"></i>
+			<h3>Smart Notes</h3>
+			<p>Organize your ideas digitally with our innovative note system.</p>
+			<a href="/notes" class="btn">Try Smart Notes</a>
+		</div>
+	</section>
+
+	<section class="testimonials">
+		<h2>What Our Users Say</h2>
+		<div class="testimonial-cards">
+			<div class="testimonial-card">
+				<p>"EarnLearn has transformed the way I learn and sell my handmade products. The courses are top-notch,
+					and the marketplace is vibrant!"</p>
+				<span>- Jane Doe, Artisan</span>
+			</div>
+			<div class="testimonial-card">
+				<p>"The smart notes feature is a game-changer for organizing my ideas. I love how everything is
+					integrated in one platform."</p>
+				<span>- John Smith, Learner</span>
+			</div>
+		</div>
+	</section>
+
+	<div id="loginModal" class="modal">
+		<div class="modal-content">
+			<a href="#" class="close">×</a>
+			<h2>Login</h2>
+			<form th:action="@{/api/users/login}" method="post">
+				<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+				<div class="form-group">
+					<label for="loginUsername"><i class="fas fa-user-circle"></i> Username</label>
+					<input type="text" id="loginUsername" name="username" placeholder="Enter your username" required />
+				</div>
+				<div class="form-group">
+					<label for="loginPassword"><i class="fas fa-lock"></i>Password</label>
+					<input type="password" id="loginPassword" name="password" placeholder="Your password" required>
+				</div>
+				<button type="submit"><i class="fas fa-sign-in-alt"></i> Login</button>
+			</form>
+		</div>
+	</div>
+
+	<div id="registerModal" class="modal">
+		<div class="modal-content">
+			<a href="#" class="close">×</a>
+			<h2>Register</h2>
+			<form th:action="@{/users/register}" th:object="${user}" method="post">
+				<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+				<div class="form-group">
+					<label for="name"><i class="fas fa-user"></i> Full Name</label>
+					<input type="text" id="name" th:field="*{name}" placeholder="Enter your full name" required />
+				</div>
+				<div class="form-group">
+					<label for="username"><i class="fas fa-user-circle"></i> Username</label>
+					<input type="text" id="username" th:field="*{username}" placeholder="Create a username" required />
+				</div>
+				<div class="form-group">
+					<label for="password"><i class="fas fa-lock"></i> Password</label>
+					<input type="password" id="password" th:field="*{password}" placeholder="Create a password"
+						required />
+				</div>
+				<div class="form-group">
+					<label for="role"><i class="fas fa-user-tag"></i> Role</label>
+					<select id="role" name="roleName" required>
+						<option th:each="role : ${roles}" th:value="${role.name}" th:text="${role.name}"></option>
+					</select>
+				</div>
+				<div class="gender-options">
+					<label for="gender">Gender:</label>
+					<label>
+						<input type="radio" value="male" th:field="*{gender}" required>
+						<i class="fas fa-mars"></i> Male
+					</label>
+					<label>
+						<input type="radio" value="female" th:field="*{gender}">
+						<i class="fas fa-venus"></i> Female
+					</label>
+					<label>
+						<input type="radio" value="other" th:field="*{gender}">
+						<i class="fas fa-genderless"></i> Other
+					</label>
+				</div>
+				<div class="form-group">
+					<label for="email"><i class="fas fa-envelope"></i> Email</label>
+					<input type="email" id="email" th:field="*{email}" placeholder="Enter your email" required />
+				</div>
+				<div class="form-group">
+					<label for="dateOfBirth"><i class="fas fa-calendar-alt"></i> Date of Birth</label>
+					<input type="date" id="dateOfBirth" th:field="*{dateOfBirth}" required />
+				</div>
+				<button type="submit"><i class="fas fa-user-plus"></i> Register</button>
+			</form>
+		</div>
+	</div>
+
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			// Close modals when clicking outside
+			window.addEventListener('click', function (event) {
+				const modals = document.querySelectorAll('.modal');
+				modals.forEach(modal => {
+					if (event.target === modal) {
+						modal.style.display = 'none';
+					}
+				});
+			});
+
+			// Close modals when pressing Escape
+			document.addEventListener('keydown', function (event) {
+				if (event.key === 'Escape') {
+					const modal = document.querySelector('.modal:target');
+					if (modal) {
+						modal.style.display = 'none';
+					}
+				}
+			});
+
+			// Handle alert messages
+			const alerts = document.querySelectorAll('.alert-container .alert');
+			alerts.forEach(alert => {
+				const timeoutId = setTimeout(() => {
+					alert.style.opacity = '0';
+					setTimeout(() => {
+						alert.style.display = 'none';
+					}, 500); // Match the transition duration
+				}, 5000);
+
+				const closeButton = alert.querySelector('.close-btn');
+				if (closeButton) {
+					closeButton.addEventListener('click', function () {
+						clearTimeout(timeoutId);
+						alert.style.opacity = '0';
+						setTimeout(() => {
+							alert.style.display = 'none';
+						}, 500);
+					});
+				}
+			});
+		});
+	</script>
+</body>
+
+</html>
